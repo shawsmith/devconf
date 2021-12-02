@@ -16,8 +16,8 @@
 
 ;;; 设置字体及大小、行高
 (defvar efs/default-font-family "Unifont")
-(defvar efs/default-font-size 140)
-(defvar efs/default-variable-font-size 140)
+(defvar efs/default-font-size 150)
+(defvar efs/default-variable-font-size 150)
 
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
@@ -88,16 +88,22 @@
 (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-(setq-default c-basic-offset 4
-			  tab-width 4
-              indent-tabs-mode nil)
-(setq nxml-child-indent 4
-	  nxml-attribute-indent 4)
+(setq-default c-basic-offset 8
+	      tab-width 8
+              indent-tabs-mode t)
+
+;;; 保存文件时删除首尾空白字符
+(add-hook 'write-file-functions 'delete-trailing-whitespace)
 
 ;;; 键盘映射
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-x b") 'ibuffer)
+
+;;; 代码格式化
+(use-package clang-format
+  :ensure t)
+(global-set-key (kbd "M-s-l") 'clang-format-buffer)
 
 (use-package ace-window
   :ensure t)
@@ -260,11 +266,6 @@
 
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
-(use-package company-box
-  :hook (company-mode . company-box-mode)
-  :config
-  (setq company-box-doc-enable nil))
-
 (defun efs/lsp-mode-setup ()
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
@@ -276,9 +277,12 @@
 		 (c++-mode . lsp-deferred)
 		 (java-mode . lsp-deferred))
   :init
-  (setq lsp-keymap-prefix "C-c l")  
+  (setq lsp-keymap-prefix "C-c l")
   :config
   (lsp-enable-which-key-integration t))
+
+(require 'lsp-java)
+(add-hook 'java-mode-hook #'lsp)
 
 (use-package treemacs
   :ensure t
@@ -331,7 +335,8 @@
           treemacs-user-header-line-format       nil
           treemacs-width                         30
           treemacs-width-is-initially-locked     0
-          treemacs-workspace-switch-cleanup      nil)
+          treemacs-workspace-switch-cleanup      nil
+	  treemacs-hide-gitignored-files-mode t)
     (treemacs-resize-icons 18)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
@@ -351,6 +356,11 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
+(with-eval-after-load 'treemacs
+  (defun treemacs-custom-filter (file _)
+    (or (s-ends-with? ".class" file)))
+  (push #'treemacs-custom-filter treemacs-ignored-file-predicates))
+
 (use-package treemacs-evil
   :after (treemacs evil)
   :ensure t)
@@ -363,31 +373,6 @@
   :after (treemacs magit)
   :ensure t)
 
-
-(use-package lsp-java
-  :ensure t
-  :after lsp-mode
-  :config
-  (add-hook 'java-mode-hook 'lsp)
-  (setq	lsp-java-signature-help-enabled nil
-		lsp-signature-auto-activate nil
-		lsp-signature-render-documentation nil
-		lsp-java-format-settings-url "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"
-		lsp-java-format-settings-profile '"GoogleStyle")
-  (progn
-	(setq lsp-java-server-install-dir "/home/saracode/.emacs.d/.cache/lsp/jdtls/jdt-language-server-1.3.0-202108171748/"
-		  lsp-java-vmargs (list
-						   "-noverify"
-						   "-Xms1G"
-						   "-Xmx1G"
-						   "-XX:+UseParallelGC"
-						   "-XX:GCTimeRatio=4"
-						   "-XX:AdaptiveSizePolicyWeight=90"
-						   "-Dsun.zip.disableMemoryMapping=true"
-						   "-XX:+UseStringDeduplication"
-						   "-javaagent:/home/saracode/.emacs.d/.cache/lombok.jar"))))
-
-
 (add-hook 'lsp-mode-hook #'lsp-lens-mode)
 
 ;;; Setup java shortcut keys
@@ -396,27 +381,17 @@
 (global-set-key (kbd "<M-s-left>") 'switch-to-prev-buffer)
 (global-set-key (kbd "<M-s-right>") 'switch-to-next-buffer)
 (global-set-key (kbd "s-r") 'lsp-rename)
-(global-set-key (kbd "M-s-l") 'lsp-format-buffer)
 (global-set-key (kbd "M-s-o") 'lsp-organize-imports)
 
 (use-package dap-mode
   :after lsp-mode
   :config (dap-auto-configure-mode))
 
-(use-package dap-java
-  :ensure nil)
-
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
   :config
   (setq lsp-ui-doc-enable nil
-		lsp-ui-sideline-enable nil))
-
-;(use-package helm-lsp)
-;(define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
-
-;(use-package helm
-;  :config (helm-mode))
+	lsp-ui-sideline-enable nil))
 
 (global-set-key (kbd "C-o") 'helm-lsp-workspace-symbol)
 
@@ -426,15 +401,3 @@
 
 (use-package lsp-ivy
   :after lsp-mode)
-
-(use-package term
-  :commands term
-  :config
-  (setq explicit-shell-file-name "/bin/bash")
-  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
-
-(use-package eterm-256color
-  :hook (term-mode . eterm-256color-mode))
-
-(use-package memory-usage
-  :ensure t)
