@@ -15,9 +15,9 @@
 
 
 ;;; 设置字体及大小、行高
-(defvar efs/default-font-family "Unifont")
-(defvar efs/default-font-size 150)
-(defvar efs/default-variable-font-size 150)
+(defvar efs/default-font-family "IBM 3270")
+(defvar efs/default-font-size 200)
+(defvar efs/default-variable-font-size 200)
 
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
@@ -42,9 +42,10 @@
 
 ;;; 设置三方包源
 (require 'package)
-(setq package-archives '(("gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-			 ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-			 ("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
+(setq package-archives '(("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+			 ;;;("melpa" . "https://melpa.org/packages/")
+			 ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+			 ("org" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -145,6 +146,10 @@
   :config
   (which-key-mode)
   (setq which-key-idle-delay 0.3))
+
+(use-package quickrun
+  :ensure t
+  :bind ("C-c r" . quickrun))
 
 ;;; ivy & counsel
 (use-package ivy
@@ -256,6 +261,16 @@
 (use-package evil-nerd-commenter
   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 
+(use-package yasnippet
+  :config (yas-global-mode))
+
+(use-package yasnippet-snippets
+  :ensure t)
+
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
 (use-package company
   :config
   (global-company-mode)
@@ -270,19 +285,50 @@
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
 
+(defun lsp-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+
+(add-hook 'lsp-mode-hook #'lsp-install-save-hooks)
+
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :hook ((lsp-mode . efs/lsp-mode-setup)
-		 (c-mode . lsp-deferred)
-		 (c++-mode . lsp-deferred)
-		 (java-mode . lsp-deferred))
+	 (c-mode . lsp-deferred)
+	 (c++-mode . lsp-deferred)
+	 (java-mode . lsp-deferred)
+	 (rust-mode . lsp-deferred))
   :init
   (setq lsp-keymap-prefix "C-c l")
   :config
   (lsp-enable-which-key-integration t))
 
-(require 'lsp-java)
-(add-hook 'java-mode-hook #'lsp)
+(use-package dap-mode
+  :ensure t
+  :after (lsp-mode)
+  :functions dap-hydra/nil
+  :config
+  (require 'dap-java)
+  :bind (:map lsp-mode-map
+         ("<f5>" . dap-debug)
+         ("M-<f5>" . dap-hydra))
+  :hook ((dap-mode . dap-ui-mode)
+	 (dap-session-created . (lambda (&_rest) (dap-hydra)))
+	 (dap-terminated . (lambda (&_rest) (dap-hydra/nil)))))
+
+(use-package dap-java
+  :ensure nil)
+
+(use-package lsp-java
+  :config (add-hook 'java-mode-hook 'lsp))
+
+(setq lsp-java-server-install-dir "~/.emacs.d/jdtls"
+      lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90" "-Dsun.zip.disableMemoryMapping=true" "-Xmx2G" "-Xms1024m")
+      lsp-rust-analyzer-server-command '("~/.cargo/bin/rust-analyzer")
+      lsp-rust-analyzer-inlay-hints-mode t
+      rust-rustfmt-bin "~/.cargo/bin/rustfmt"
+      rust-cargo-bin "~/.cargo/bin/cargo"
+      rust-format-on-save t)
 
 (use-package treemacs
   :ensure t
@@ -334,9 +380,8 @@
           treemacs-user-mode-line-format         nil
           treemacs-user-header-line-format       nil
           treemacs-width                         30
-          treemacs-width-is-initially-locked     0
-          treemacs-workspace-switch-cleanup      nil
-	  treemacs-hide-gitignored-files-mode t)
+          treemacs-width-is-initially-locked     nil
+          treemacs-workspace-switch-cleanup      nil)
     (treemacs-resize-icons 18)
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
@@ -358,8 +403,18 @@
 
 (with-eval-after-load 'treemacs
   (defun treemacs-custom-filter (file _)
-    (or (s-ends-with? ".class" file)))
+    (or (s-ends-with? ".class" file)
+	(s-ends-with? ".log" file)
+	(s-ends-with? ".lock" file)))
   (push #'treemacs-custom-filter treemacs-ignored-file-predicates))
+
+(use-package lsp-treemacs
+  :after (lsp-mode treemacs)
+  :ensure t
+  :commands lsp-treemacs-errors-list
+  :bind (:map lsp-mode-map
+              ("M-9" . lsp-treemacs-errors-list)))
+(setq lsp-treemacs-sync-mode 1)
 
 (use-package treemacs-evil
   :after (treemacs evil)
@@ -383,21 +438,37 @@
 (global-set-key (kbd "s-r") 'lsp-rename)
 (global-set-key (kbd "M-s-o") 'lsp-organize-imports)
 
-(use-package dap-mode
-  :after lsp-mode
-  :config (dap-auto-configure-mode))
-
 (use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :config
-  (setq lsp-ui-doc-enable nil
-	lsp-ui-sideline-enable nil))
+:ensure t
+:after (lsp-mode)
+:bind (:map lsp-ui-mode-map
+         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+         ([remap xref-find-references] . lsp-ui-peek-find-references))
+:init (setq lsp-ui-doc-enable nil
+	    lsp-ui-sideline-enable nil))
 
-(global-set-key (kbd "C-o") 'helm-lsp-workspace-symbol)
 
-(use-package lsp-treemacs
-  :after lsp-mode)
-(setq lsp-treemacs-sync-mode 1)
+(use-package helm
+:ensure t
+:init
+(helm-mode 1)
+(progn (setq helm-buffers-fuzzy-matching t))
+:bind
+(("C-c h" . helm-command-prefix))
+(("C-c b" . helm-bookmarks))
+(("C-c f" . helm-recentf))   ;; Add new key to recentf
+(("C-c g" . helm-grep-do-git-grep)))
+
+(use-package helm-descbinds
+:ensure t
+:bind ("C-h b" . helm-descbinds))
+
+(use-package helm-lsp
+:ensure t
+:after (lsp-mode)
+:commands (helm-lsp-workspace-symbol)
+:init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
+
 
 (use-package lsp-ivy
   :after lsp-mode)
