@@ -16,8 +16,8 @@
 
 ;;; 设置字体及大小、行高
 (defvar efs/default-font-family "IBM 3270")
-(defvar efs/default-font-size 200)
-(defvar efs/default-variable-font-size 200)
+(defvar efs/default-font-size 210)
+(defvar efs/default-variable-font-size 210)
 
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
@@ -31,7 +31,7 @@
 		    :family efs/default-font-family
 		    :height efs/default-variable-font-size
 		    :weight 'regular)
-(setq-default line-spacing 0.1)
+(setq-default line-spacing 0.0)
 
 ;;; 禁用自动备份、保存
 (setq make-backup-files nil
@@ -42,10 +42,9 @@
 
 ;;; 设置三方包源
 (require 'package)
-(setq package-archives '(("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-			 ;;;("melpa" . "https://melpa.org/packages/")
-			 ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-			 ("org" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
+(setq package-archives '(("gnu" . "http://mirrors.ustc.edu.cn/elpa/gnu/")
+                         ("melpa" . "http://mirrors.ustc.edu.cn/elpa/melpa/")
+                         ("nongnu" . "http://mirrors.ustc.edu.cn/elpa/nongnu/")))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -91,7 +90,7 @@
 
 (setq-default c-basic-offset 8
 	      tab-width 8
-              indent-tabs-mode t)
+          indent-tabs-mode nil)
 
 ;;; 保存文件时删除首尾空白字符
 (add-hook 'write-file-functions 'delete-trailing-whitespace)
@@ -101,10 +100,13 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-x b") 'ibuffer)
 
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
 ;;; 代码格式化
-(use-package clang-format
-  :ensure t)
-(global-set-key (kbd "M-s-l") 'clang-format-buffer)
+;;;(use-package clang-format
+;;;  :ensure t)
+(global-set-key (kbd "M-s-l") 'lsp-format-buffer)
 
 (use-package ace-window
   :ensure t)
@@ -117,9 +119,8 @@
   :commands command-log-mode)
 
 ;;; 设置主题
-(use-package zenburn-theme
+ (use-package zenburn-theme
   :init (load-theme 'zenburn t))
-
 
 ;;; 设置Modeline
 (use-package all-the-icons)
@@ -136,9 +137,6 @@
   :bind (("<M-up>". drag-stuff-up)
          ("<M-down>" . drag-stuff-down)))
 
-(use-package flycheck
-  :hook (after-init . global-flycheck-mode))
-
 ;;; Which-Key提示
 (use-package which-key
   :defer 0
@@ -146,10 +144,6 @@
   :config
   (which-key-mode)
   (setq which-key-idle-delay 0.3))
-
-(use-package quickrun
-  :ensure t
-  :bind ("C-c r" . quickrun))
 
 ;;; ivy & counsel
 (use-package ivy
@@ -163,7 +157,7 @@
          :map ivy-switch-buffer-map
          ("C-k" . ivy-previous-line)
          ("C-l" . ivy-done)
-		 ("C-d" . ivy-switch-buffer-kill)
+	 ("C-d" . ivy-switch-buffer-kill)
          :map ivy-reverse-i-search-map
          ("C-k" . ivy-previous-line)
          ("C-d" . ivy-reverse-i-search-kill))
@@ -182,20 +176,6 @@
   (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
   :config
   (counsel-mode 1))
-
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
-
-(use-package helpful
-  :commands (helpful-callable helpful-variable helpful-command helpful-key)
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
 
 (use-package general
   :config
@@ -281,15 +261,19 @@
 
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
-(defun efs/lsp-mode-setup ()
-  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-mode))
-
-(defun lsp-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-
-(add-hook 'lsp-mode-hook #'lsp-install-save-hooks)
+(use-package rust-mode
+  :mode
+  (("\\.rs\\'" . rust-mode))
+  :hook
+  (rust-mode . global-linum-mode) ;; 行显示
+  (rust-mode . hs-minor-mode) ;; 折叠模式
+  (rust-mode . eldoc-mode) ;; 代码追踪
+  (rust-mode . company-mode) ;; 自动填充
+  (rust-mode . cargo-minor-mode)
+  (rust-mode . racer-mode)
+  (rust-mode . (lambda () (setq indent-tabs-mode nil))) ;; 设置缩进
+  :config
+  (setq rust-format-on-save t))
 
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
@@ -302,6 +286,15 @@
   (setq lsp-keymap-prefix "C-c l")
   :config
   (lsp-enable-which-key-integration t))
+
+(defun efs/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+(defun lsp-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'lsp-mode-hook #'lsp-install-save-hooks)
 
 (use-package dap-mode
   :ensure t
@@ -320,15 +313,12 @@
   :ensure nil)
 
 (use-package lsp-java
-  :config (add-hook 'java-mode-hook 'lsp))
-
-(setq lsp-java-server-install-dir "~/.emacs.d/jdtls"
-      lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90" "-Dsun.zip.disableMemoryMapping=true" "-Xmx2G" "-Xms1024m")
-      lsp-rust-analyzer-server-command '("~/.cargo/bin/rust-analyzer")
-      lsp-rust-analyzer-inlay-hints-mode t
-      rust-rustfmt-bin "~/.cargo/bin/rustfmt"
-      rust-cargo-bin "~/.cargo/bin/cargo"
-      rust-format-on-save t)
+  :ensure t
+  :init
+  (add-hook 'java-mode-hook #'lsp)
+  (setq lsp-java-format-on-type-enabled nil
+	lsp-java-format-settings-url '"/Users/shawsmith/.emacs.d/eclipse-java-google-style.xml"
+	lsp-java-format-settings-profile '"GoogleStyle"))
 
 (use-package treemacs
   :ensure t
@@ -435,15 +425,16 @@
 (global-set-key (kbd "M-s-t") 'lsp-find-type-definition)
 (global-set-key (kbd "<M-s-left>") 'switch-to-prev-buffer)
 (global-set-key (kbd "<M-s-right>") 'switch-to-next-buffer)
-(global-set-key (kbd "s-r") 'lsp-rename)
+(global-set-key (kbd "M-s-r") 'lsp-rename)
 (global-set-key (kbd "M-s-o") 'lsp-organize-imports)
+(global-set-key (kbd "M-RET") 'lsp-java-add-import)
 
 (use-package lsp-ui
 :ensure t
 :after (lsp-mode)
 :bind (:map lsp-ui-mode-map
-         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-         ([remap xref-find-references] . lsp-ui-peek-find-references))
+            ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+            ([remap xref-find-references] . lsp-ui-peek-find-references))
 :init (setq lsp-ui-doc-enable nil
 	    lsp-ui-sideline-enable nil))
 
@@ -462,13 +453,6 @@
 (use-package helm-descbinds
 :ensure t
 :bind ("C-h b" . helm-descbinds))
-
-(use-package helm-lsp
-:ensure t
-:after (lsp-mode)
-:commands (helm-lsp-workspace-symbol)
-:init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
-
 
 (use-package lsp-ivy
   :after lsp-mode)
