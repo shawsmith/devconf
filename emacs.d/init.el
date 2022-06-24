@@ -16,8 +16,8 @@
 
 ;;; 设置字体及大小、行高
 (defvar efs/default-font-family "IBM 3270")
-(defvar efs/default-font-size 210)
-(defvar efs/default-variable-font-size 210)
+(defvar efs/default-font-size 160)
+(defvar efs/default-variable-font-size 160)
 
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
@@ -76,6 +76,8 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 (electric-pair-mode 1)
+(blink-cursor-mode 0)
+(setq visible-cursor nil)
 (setq electric-pair-pairs
       '((?\" . ?\")
         (?\{ . ?\})))
@@ -85,12 +87,13 @@
 		treemacs-mode-hook
 		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
 (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 (setq-default c-basic-offset 8
 	      tab-width 8
-          indent-tabs-mode nil)
+              indent-tabs-mode nil)
 
 ;;; 保存文件时删除首尾空白字符
 (add-hook 'write-file-functions 'delete-trailing-whitespace)
@@ -114,12 +117,8 @@
 
 (use-package restart-emacs)
 
-;;; 记录每次输入的命令
-(use-package command-log-mode
-  :commands command-log-mode)
-
 ;;; 设置主题
- (use-package zenburn-theme
+(use-package zenburn-theme
   :init (load-theme 'zenburn t))
 
 ;;; 设置Modeline
@@ -261,16 +260,17 @@
 
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
+(use-package exec-path-from-shell
+  :ensure t
+  :init (exec-path-from-shell-initialize))
+
 (use-package rust-mode
   :mode
   (("\\.rs\\'" . rust-mode))
   :hook
-  (rust-mode . global-linum-mode) ;; 行显示
   (rust-mode . hs-minor-mode) ;; 折叠模式
   (rust-mode . eldoc-mode) ;; 代码追踪
   (rust-mode . company-mode) ;; 自动填充
-  (rust-mode . cargo-minor-mode)
-  (rust-mode . racer-mode)
   (rust-mode . (lambda () (setq indent-tabs-mode nil))) ;; 设置缩进
   :config
   (setq rust-format-on-save t))
@@ -313,12 +313,7 @@
   :ensure nil)
 
 (use-package lsp-java
-  :ensure t
-  :init
-  (add-hook 'java-mode-hook #'lsp)
-  (setq lsp-java-format-on-type-enabled nil
-	lsp-java-format-settings-url '"/Users/shawsmith/.emacs.d/eclipse-java-google-style.xml"
-	lsp-java-format-settings-profile '"GoogleStyle"))
+  :ensure t)
 
 (use-package treemacs
   :ensure t
@@ -437,7 +432,7 @@
             ([remap xref-find-references] . lsp-ui-peek-find-references))
 :init (setq lsp-ui-doc-enable nil
 	    lsp-ui-sideline-enable nil))
-
+(add-hook 'lsp-ui-doc-mode-hook #'(lambda()(display-line-numbers-mode -1)))
 
 (use-package helm
 :ensure t
