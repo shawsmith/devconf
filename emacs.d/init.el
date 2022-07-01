@@ -1,24 +1,43 @@
-;;; 调整性能相关参数.
-(setq gc-cons-threshold 100000000
-      read-process-output-max (* 1024 1024))
+;;; Emacs basic configuration.
+(setq inhibit-startup-message t)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(tooltip-mode -1)
+(set-fringe-mode 10)
+(setq visible-bell nil)
+(blink-cursor-mode 0)
+(global-hl-line-mode 1)
+(setq visible-cursor nil)
+(column-number-mode)
+(global-display-line-numbers-mode t)
+(electric-pair-mode 1)
+(setq electric-pair-pairs
+      '((?\" . ?\")
+        (?\{ . ?\})))
+
+(set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+
+;;; Tab configuration
+(defvar tab-width-size 4)
+(setq-default c-basic-offset tab-width-size
+	      tab-width tab-width-size
+          indent-tabs-mode nil)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-;;; 启动时展示启动时间及垃圾回收次数.
-(defun efs/display-startup-time ()
-  (message "Emacs loaded in %s with %d garbage collections."
-	   (format "%.2f seconds"
-		   (float-time
-		    (time-subtract after-init-time before-init-time)))
-	   gcs-done))
-(add-hook 'emacs-startup-hook #'efs/display-startup-time)
+;;; File configuration.
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(global-auto-revert-mode t)
+(add-hook 'write-file-functions 'delete-trailing-whitespace)
 
-
-;;; 设置字体及大小、行高
+;;; Font configuration
 (defvar efs/default-font-family "IBM 3270")
-(defvar efs/default-font-size 160)
-(defvar efs/default-variable-font-size 160)
-
+(defvar efs/default-font-size 150)
+(defvar efs/default-variable-font-size 150)
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
 		    :height efs/default-font-size
@@ -33,29 +52,23 @@
 		    :weight 'regular)
 (setq-default line-spacing 0.0)
 
-;;; 禁用自动备份、保存
-(setq make-backup-files nil
-      auto-save-default nil)
+;;; Keymap configuration.
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-x b") 'ibuffer)
 
-;;; Auto reload buffer when file content changed.
-(global-auto-revert-mode t)
-
-;;; 设置三方包源
+;;; Melpa package manager & auto renew configuration.
 (require 'package)
-(setq package-archives '(("gnu" . "http://mirrors.ustc.edu.cn/elpa/gnu/")
-                         ("melpa" . "http://mirrors.ustc.edu.cn/elpa/melpa/")
-                         ("nongnu" . "http://mirrors.ustc.edu.cn/elpa/nongnu/")))
+(setq package-archives '(("melpa" . "http://mirrors.ustc.edu.cn/elpa/melpa/")))
+
 (package-initialize)
+
 (unless package-archive-contents
   (package-refresh-contents))
 
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
-(require 'use-package)
-(setq use-package-always-ensure t)
-
-;;; 设置软件包自动更新
 (use-package auto-package-update
   :custom
   (auto-package-update-interval 7)
@@ -65,78 +78,43 @@
   (auto-package-update-maybe)
   (auto-package-update-at-time "10:00"))
 
-;;; 设置一些界面上的UI样式
-(setq inhibit-startup-message t)
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(tooltip-mode -1)
-(set-fringe-mode 10)
-(menu-bar-mode -1)
-(setq visible-bell nil)
-(column-number-mode)
-(global-display-line-numbers-mode t)
-(electric-pair-mode 1)
-(blink-cursor-mode 0)
-(setq visible-cursor nil)
-(setq electric-pair-pairs
-      '((?\" . ?\")
-        (?\{ . ?\})))
-(dolist (mode '(org-mode-hook
-		term-mode-hook
-		shell-mode-hook
-		treemacs-mode-hook
-		eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+;;; Installed package configuration.
 
-(setq-default c-basic-offset 8
-	      tab-width 8
-              indent-tabs-mode nil)
+(use-package restart-emacs
+  :ensure t)
 
-;;; 保存文件时删除首尾空白字符
-(add-hook 'write-file-functions 'delete-trailing-whitespace)
+(use-package zenburn-theme
+  :ensure t
+  :init (load-theme 'zenburn t))
 
-;;; 键盘映射
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-(global-set-key (kbd "C-x b") 'ibuffer)
+(use-package all-the-icons
+  :ensure t)
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 5)))
 
 (use-package rainbow-delimiters
+  :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
-
-;;; 代码格式化
-;;;(use-package clang-format
-;;;  :ensure t)
-(global-set-key (kbd "M-s-l") 'lsp-format-buffer)
 
 (use-package ace-window
   :ensure t)
 (global-set-key (kbd "M-o") 'ace-window)
 
-(use-package restart-emacs)
-
-;;; 设置主题
-(use-package zenburn-theme
-  :init (load-theme 'zenburn t))
-
-;;; 设置Modeline
-(use-package all-the-icons)
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 5)))
-
 (use-package hungry-delete
+  :ensure t
   :bind (("C-c DEL" . hungry-delete-backward)
 	 ("C-c d" . hungry-delete-forward)))
 (global-hungry-delete-mode)
 
 (use-package drag-stuff
+  :ensure t
   :bind (("<M-up>". drag-stuff-up)
          ("<M-down>" . drag-stuff-down)))
 
-;;; Which-Key提示
 (use-package which-key
   :defer 0
   :diminish which-key-mode
@@ -164,10 +142,12 @@
   (ivy-mode 1))
 
 (use-package ivy-rich
+  :ensure t
   :init
   (ivy-rich-mode 1))
 
 (use-package counsel
+  :ensure t
   :bind (("C-M-j" . 'counsel-switch-buffer)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
@@ -187,6 +167,7 @@
     "tt" '(counsel-load-theme :which-key "choose theme")))
 
 (use-package evil
+  :ensure t
   :init
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
@@ -202,20 +183,10 @@
   (evil-set-initial-state 'dashboard-mode 'normal))
 
 (use-package evil-collection
+  :ensure t
   :after evil
   :config
   (evil-collection-init))
-
-;;; 缩放字体
-(use-package hydra
-  :defer t
-  :bind(("C-c t s" . hydra-text-scale/body)))
-
-(defhydra hydra-text-scale (:timeout 10)
-  "scale text"
-  ("+" text-scale-increase "in")
-  ("-" text-scale-decrease "out")
-  ("q" nil "finished" :exit t))
 
 (use-package projectile
   :diminish projectile-mode
@@ -268,10 +239,10 @@
   :mode
   (("\\.rs\\'" . rust-mode))
   :hook
-  (rust-mode . hs-minor-mode) ;; 折叠模式
-  (rust-mode . eldoc-mode) ;; 代码追踪
-  (rust-mode . company-mode) ;; 自动填充
-  (rust-mode . (lambda () (setq indent-tabs-mode nil))) ;; 设置缩进
+  (rust-mode . hs-minor-mode)
+  (rust-mode . eldoc-mode)
+  (rust-mode . company-mode)
+  (rust-mode . (lambda () (setq indent-tabs-mode nil)))
   :config
   (setq rust-format-on-save t))
 
@@ -287,6 +258,8 @@
   :config
   (lsp-enable-which-key-integration t))
 
+(global-set-key (kbd "M-s-l") 'lsp-format-buffer)
+
 (defun efs/lsp-mode-setup ()
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
@@ -295,22 +268,6 @@
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 (add-hook 'lsp-mode-hook #'lsp-install-save-hooks)
-
-(use-package dap-mode
-  :ensure t
-  :after (lsp-mode)
-  :functions dap-hydra/nil
-  :config
-  (require 'dap-java)
-  :bind (:map lsp-mode-map
-         ("<f5>" . dap-debug)
-         ("M-<f5>" . dap-hydra))
-  :hook ((dap-mode . dap-ui-mode)
-	 (dap-session-created . (lambda (&_rest) (dap-hydra)))
-	 (dap-terminated . (lambda (&_rest) (dap-hydra/nil)))))
-
-(use-package dap-java
-  :ensure nil)
 
 (use-package lsp-java
   :ensure t)
@@ -386,11 +343,16 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
+(add-hook 'treemacs-mode-hook (lambda() (display-line-numbers-mode -1)))
+
 (with-eval-after-load 'treemacs
   (defun treemacs-custom-filter (file _)
     (or (s-ends-with? ".class" file)
 	(s-ends-with? ".log" file)
-	(s-ends-with? ".lock" file)))
+	(s-ends-with? ".lock" file)
+        (s-ends-with? ".settings" file)
+        (s-ends-with? ".classpath" file)
+        (s-ends-with? ".project" file)))
   (push #'treemacs-custom-filter treemacs-ignored-file-predicates))
 
 (use-package lsp-treemacs
@@ -425,29 +387,14 @@
 (global-set-key (kbd "M-RET") 'lsp-java-add-import)
 
 (use-package lsp-ui
-:ensure t
-:after (lsp-mode)
-:bind (:map lsp-ui-mode-map
-            ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-            ([remap xref-find-references] . lsp-ui-peek-find-references))
-:init (setq lsp-ui-doc-enable nil
-	    lsp-ui-sideline-enable nil))
+  :ensure t
+  :after (lsp-mode)
+  :bind (:map lsp-ui-mode-map
+              ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+              ([remap xref-find-references] . lsp-ui-peek-find-references))
+  :init (setq lsp-ui-doc-enable nil
+	      lsp-ui-sideline-enable nil))
 (add-hook 'lsp-ui-doc-mode-hook #'(lambda()(display-line-numbers-mode -1)))
-
-(use-package helm
-:ensure t
-:init
-(helm-mode 1)
-(progn (setq helm-buffers-fuzzy-matching t))
-:bind
-(("C-c h" . helm-command-prefix))
-(("C-c b" . helm-bookmarks))
-(("C-c f" . helm-recentf))   ;; Add new key to recentf
-(("C-c g" . helm-grep-do-git-grep)))
-
-(use-package helm-descbinds
-:ensure t
-:bind ("C-h b" . helm-descbinds))
 
 (use-package lsp-ivy
   :after lsp-mode)
