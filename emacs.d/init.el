@@ -23,8 +23,8 @@
 ;;; Tab configuration
 (defvar tab-width-size 4)
 (setq-default c-basic-offset tab-width-size
-	      tab-width tab-width-size
-          indent-tabs-mode nil)
+              tab-width tab-width-size
+              indent-tabs-mode nil)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -35,9 +35,9 @@
 (add-hook 'write-file-functions 'delete-trailing-whitespace)
 
 ;;; Font configuration
-(defvar efs/default-font-family "IBM 3270")
-(defvar efs/default-font-size 150)
-(defvar efs/default-variable-font-size 150)
+(defvar efs/default-font-family "Ubuntu Mono for Powerline")
+(defvar efs/default-font-size 130)
+(defvar efs/default-variable-font-size 130)
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
 		    :height efs/default-font-size
@@ -59,7 +59,8 @@
 
 ;;; Melpa package manager & auto renew configuration.
 (require 'package)
-(setq package-archives '(("melpa" . "http://mirrors.ustc.edu.cn/elpa/melpa/")))
+(setq package-archives '(("gnu"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
+                       ("melpa" . "http://mirrors.cloud.tencent.com/elpa/melpa/")))
 
 (package-initialize)
 
@@ -68,16 +69,6 @@
 
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
-
-(use-package auto-package-update
-  :custom
-  (auto-package-update-interval 7)
-  (auto-package-update-prompt-before-update t)
-  (auto-package-update-hide-results t)
-  :config
-  (auto-package-update-maybe)
-  (auto-package-update-at-time "10:00"))
-
 
 ;;; Installed package configuration.
 
@@ -90,11 +81,6 @@
 
 (use-package all-the-icons
   :ensure t)
-
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 5)))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -122,6 +108,7 @@
   (which-key-mode)
   (setq which-key-idle-delay 0.3))
 
+
 ;;; ivy & counsel
 (use-package ivy
   :diminish
@@ -134,7 +121,7 @@
          :map ivy-switch-buffer-map
          ("C-k" . ivy-previous-line)
          ("C-l" . ivy-done)
-	 ("C-d" . ivy-switch-buffer-kill)
+	     ("C-d" . ivy-switch-buffer-kill)
          :map ivy-reverse-i-search-map
          ("C-k" . ivy-previous-line)
          ("C-d" . ivy-reverse-i-search-kill))
@@ -157,14 +144,12 @@
   (counsel-mode 1))
 
 (use-package general
+  :ensure t
   :config
   (general-create-definer efs/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
-    :global-prefix "C-SPC")
-  (efs/leader-keys
-    "t"  '(:ignore t :which-key "toggles")
-    "tt" '(counsel-load-theme :which-key "choose theme")))
+    :global-prefix "C-SPC"))
 
 (use-package evil
   :ensure t
@@ -176,11 +161,7 @@
   :config
   (evil-mode 0)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-  (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal))
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join))
 
 (use-package evil-collection
   :ensure t
@@ -189,8 +170,8 @@
   (evil-collection-init))
 
 (use-package projectile
+  :ensure t
   :diminish projectile-mode
-  :config (projectile-mode)
   :custom ((projectile-completion-system 'ivy))
   :bind-keymap
   ("C-c p" . projectile-command-map)
@@ -200,18 +181,21 @@
   (setq projectile-switch-project-action #'projectile-dired))
 
 (use-package counsel-projectile
-  :after projectile
-  :config (counsel-projectile-mode))
+  :ensure t
+  :after projectile)
 
 (use-package magit
+  :ensure t
   :commands magit-status
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
 (use-package evil-nerd-commenter
+  :ensure t
   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 
 (use-package yasnippet
+  :ensure t
   :config (yas-global-mode))
 
 (use-package yasnippet-snippets
@@ -222,47 +206,30 @@
   :init (global-flycheck-mode))
 
 (use-package company
+  :ensure t
+  :init (global-company-mode)
   :config
-  (global-company-mode)
   (setq
    company-minimum-prefix-length 0
-   company-idle-delay 0.0
-   company-show-quick-access t))
-
-(global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+   company-idle-delay 0.0))
 
 (use-package exec-path-from-shell
   :ensure t
   :init (exec-path-from-shell-initialize))
 
-(use-package rust-mode
-  :mode
-  (("\\.rs\\'" . rust-mode))
-  :hook
-  (rust-mode . hs-minor-mode)
-  (rust-mode . eldoc-mode)
-  (rust-mode . company-mode)
-  (rust-mode . (lambda () (setq indent-tabs-mode nil)))
-  :config
-  (setq rust-format-on-save t))
 
 (use-package lsp-mode
+  :ensure t
   :commands (lsp lsp-deferred)
   :hook ((lsp-mode . efs/lsp-mode-setup)
 	 (c-mode . lsp-deferred)
 	 (c++-mode . lsp-deferred)
-	 (java-mode . lsp-deferred)
-	 (rust-mode . lsp-deferred))
+	 (java-mode . lsp-deferred))
   :init
-  (setq lsp-keymap-prefix "C-c l")
-  :config
-  (lsp-enable-which-key-integration t))
+  (setq lsp-keymap-prefix "C-c l"))
 
 (global-set-key (kbd "M-s-l") 'lsp-format-buffer)
 
-(defun efs/lsp-mode-setup ()
-  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-mode))
 
 (defun lsp-install-save-hooks ()
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
@@ -325,9 +292,6 @@
           treemacs-width-is-initially-locked     nil
           treemacs-workspace-switch-cleanup      nil)
     (treemacs-resize-icons 18)
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode 'always)
     (pcase (cons (not (null (executable-find "git")))
                  (not (null treemacs-python-executable)))
       (`(t . t)
@@ -356,8 +320,8 @@
   (push #'treemacs-custom-filter treemacs-ignored-file-predicates))
 
 (use-package lsp-treemacs
-  :after (lsp-mode treemacs)
   :ensure t
+  :after (lsp-mode treemacs)
   :commands lsp-treemacs-errors-list
   :bind (:map lsp-mode-map
               ("M-9" . lsp-treemacs-errors-list)))
@@ -397,4 +361,5 @@
 (add-hook 'lsp-ui-doc-mode-hook #'(lambda()(display-line-numbers-mode -1)))
 
 (use-package lsp-ivy
+  :ensure t
   :after lsp-mode)
