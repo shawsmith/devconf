@@ -221,8 +221,7 @@
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred)
-  :hook ((lsp-mode . efs/lsp-mode-setup)
-	 (c-mode . lsp-deferred)
+  :hook ((c-mode . lsp-deferred)
 	 (c++-mode . lsp-deferred)
 	 (java-mode . lsp-deferred))
   :init
