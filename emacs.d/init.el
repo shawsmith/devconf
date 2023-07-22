@@ -36,8 +36,8 @@
 
 ;;; Font configuration
 (defvar efs/default-font-family "Ubuntu Mono for Powerline")
-(defvar efs/default-font-size 130)
-(defvar efs/default-variable-font-size 130)
+(defvar efs/default-font-size 120)
+(defvar efs/default-variable-font-size 120)
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
 		    :height efs/default-font-size
@@ -356,7 +356,7 @@
               ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
               ([remap xref-find-references] . lsp-ui-peek-find-references))
   :init (setq lsp-ui-doc-enable nil
-	      lsp-ui-sideline-enable nil))
+	          lsp-ui-sideline-enable nil))
 (add-hook 'lsp-ui-doc-mode-hook #'(lambda()(display-line-numbers-mode -1)))
 
 (use-package lsp-ivy
