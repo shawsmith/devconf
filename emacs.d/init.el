@@ -21,7 +21,7 @@
 
 
 ;;; Tab configuration
-(defvar tab-width-size 4)
+(defvar tab-width-size 8)
 (setq-default c-basic-offset tab-width-size
               tab-width tab-width-size
               indent-tabs-mode nil)
@@ -34,10 +34,10 @@
 (global-auto-revert-mode t)
 (add-hook 'write-file-functions 'delete-trailing-whitespace)
 
-;;; Font configuration
-(defvar efs/default-font-family "Ubuntu Mono for Powerline")
-(defvar efs/default-font-size 120)
-(defvar efs/default-variable-font-size 120)
+;;; Font configuration.
+(defvar efs/default-font-family "Source Code Pro")
+(defvar efs/default-font-size 220)
+(defvar efs/default-variable-font-size 220)
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
 		    :height efs/default-font-size
@@ -323,7 +323,7 @@
   :after (lsp-mode treemacs)
   :commands lsp-treemacs-errors-list
   :bind (:map lsp-mode-map
-              ("M-9" . lsp-treemacs-errors-list)))
+		  ("M-9" . lsp-treemacs-errors-list)))
 (setq lsp-treemacs-sync-mode 1)
 
 (use-package treemacs-evil
@@ -362,3 +362,16 @@
 (use-package lsp-ivy
   :ensure t
   :after lsp-mode)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(lsp-ivy lsp-ui treemacs-magit treemacs-projectile treemacs-evil lsp-java lsp-mode exec-path-from-shell company flycheck yasnippet-snippets yasnippet evil-nerd-commenter magit counsel-projectile projectile evil-collection evil general counsel ivy-rich drag-stuff hungry-delete ace-window rainbow-delimiters all-the-icons zenburn-theme restart-emacs)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
