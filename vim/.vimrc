@@ -1,3 +1,6 @@
+set langmenu=en_US.UTF-8
+language en_US
+
 let mapleader=" "
 set nocompatible
 filetype on
@@ -16,10 +19,16 @@ syntax on
 set number
 set relativenumber
 set cursorline
+" hi CursorLine term=NONE cterm=NONE guibg=Grey40
 set wrap
 set showcmd
 set wildmenu
 set scrolloff=5
+set tw=0
+set indentexpr=
+set backspace=indent,eol,start
+set foldmethod=indent
+set foldlevel=99
 set hlsearch
 exec "nohlsearch"
 set incsearch
@@ -27,7 +36,6 @@ set ignorecase
 set smartcase
 noremap <ESC> :noh<RETURN><ESC>
 
-map s :<nop>
 map S :w<CR>
 map Q :q<CR>
 map R :source $MYVIMRC<CR>
@@ -67,7 +75,3 @@ call plug#end()
 
 " set airline theme
 let g:airline_theme='ayu_mirage'
-
-" nerd tree"
-noremap tt :NERDTreeToggle<CR>
-
