@@ -70,18 +70,16 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-"Plug 'ryanoasis/vim-devicons'
-"Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'ycm-core/YouCompleteMe'
 Plug 'tpope/vim-fugitive'
 Plug 'gisphm/vim-gitignore', { 'for': ['gitignore', 'vim-plug'] }
-Plug 'morhetz/gruvbox'
+"Plug 'morhetz/gruvbox'
 
 call plug#end()
 
 " Gruvbox
-colorscheme gruvbox 
-set background=dark
+"colorscheme gruvbox 
+"set background=dark
 let g:airline_theme='ayu_mirage'
 
 " NERDTree
@@ -107,7 +105,7 @@ let g:NERDTreeGitStatusShowClean = 1
 let g:NERDTreeGitStatusConcealBrackets = 1 
 
 " YcmComplete
-"let g:ycm_confirm_extra_conf=0
+let g:ycm_confirm_extra_conf=0
 let g:ycm_collect_identifiers_from_comments_and_strings = 0
 let g:ycm_min_num_of_chars_for_completion=1
 let g:ycm_cache_omnifunc=0
