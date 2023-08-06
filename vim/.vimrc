@@ -70,8 +70,8 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'ryanoasis/vim-devicons'
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+"Plug 'ryanoasis/vim-devicons'
+"Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'ycm-core/YouCompleteMe'
 Plug 'tpope/vim-fugitive'
 Plug 'gisphm/vim-gitignore', { 'for': ['gitignore', 'vim-plug'] }
@@ -80,9 +80,9 @@ Plug 'morhetz/gruvbox'
 call plug#end()
 
 " Gruvbox
-colorscheme gruvbox
+colorscheme gruvbox 
 set background=dark
-let g:airline_theme='gruvbox'
+let g:airline_theme='ayu_mirage'
 
 " NERDTree
 map tt :NERDTreeToggle<CR>
@@ -106,3 +106,18 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
 let g:NERDTreeGitStatusShowClean = 1
 let g:NERDTreeGitStatusConcealBrackets = 1 
 
+" YcmComplete
+"let g:ycm_confirm_extra_conf=0
+let g:ycm_collect_identifiers_from_comments_and_strings = 0
+let g:ycm_min_num_of_chars_for_completion=1
+let g:ycm_cache_omnifunc=0
+let g:ycm_seed_identifiers_with_syntax=1
+let g:ycm_complete_in_comments = 1
+let g:ycm_complete_in_strings = 1
+let g:ycm_filetype_blacklist = {
+    \ 'tagbar' : 1,
+    \ 'nerdtree' : 1,
+    \}
+let g:ycm_autoclose_preview_window_after_completion=1
+let g:ycm_autoclose_preview_window_after_insertion=1
+set completeopt-=preview
