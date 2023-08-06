@@ -1,5 +1,4 @@
 set langmenu=en_US.UTF-8
-language en_US
 
 let mapleader=" "
 set nocompatible
@@ -19,7 +18,7 @@ syntax on
 set number
 set relativenumber
 set cursorline
-" hi CursorLine term=NONE cterm=NONE guibg=Grey40
+"hi CursorLine term=NONE cterm=NONE guibg=Grey40
 set wrap
 set showcmd
 set wildmenu
@@ -70,8 +69,40 @@ call plug#begin('~/.vim/plugged')
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'preservim/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'ryanoasis/vim-devicons'
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+Plug 'ycm-core/YouCompleteMe'
+Plug 'tpope/vim-fugitive'
+Plug 'gisphm/vim-gitignore', { 'for': ['gitignore', 'vim-plug'] }
+Plug 'morhetz/gruvbox'
 
 call plug#end()
 
-" set airline theme
-let g:airline_theme='ayu_mirage'
+" Gruvbox
+colorscheme gruvbox
+set background=dark
+let g:airline_theme='gruvbox'
+
+" NERDTree
+map tt :NERDTreeToggle<CR>
+let g:NERDTreeShowHidden=1
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+" NERDTree-git
+let g:NERDTreeGitStatusIndicatorMapCustom = {
+                \ 'Modified'  :'✹',
+                \ 'Staged'    :'✚',
+                \ 'Untracked' :'✭',
+                \ 'Renamed'   :'➜',
+                \ 'Unmerged'  :'═',
+                \ 'Deleted'   :'✖',
+                \ 'Dirty'     :'✗',
+                \ 'Ignored'   :'☒',
+                \ 'Clean'     :'✔︎',
+                \ 'Unknown'   :'?'
+                \ }
+
+let g:NERDTreeGitStatusShowClean = 1
+let g:NERDTreeGitStatusConcealBrackets = 1 
+
