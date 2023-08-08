@@ -1,5 +1,5 @@
 set langmenu=en_US.UTF-8
-set helplang=en
+let $LANG='en'
 
 let mapleader=" "
 set nocompatible
@@ -7,6 +7,9 @@ filetype on
 filetype indent on
 filetype plugin on
 filetype plugin indent on
+set nobackup
+set nowritebackup
+set noswapfile
 set mouse=a
 set encoding=utf-8
 let &t_ut=''
@@ -39,6 +42,8 @@ noremap <ESC> :noh<RETURN><ESC>
 map S :w<CR>
 map Q :q<CR>
 map R :source $MYVIMRC<CR>
+map lc :e $MYVIMRC<CR>
+map lg :e ~/.vim/coc-settings.json<CR>
 
 " split window
 map sh :set nosplitright<CR>:vsplit<CR>
@@ -78,7 +83,8 @@ call plug#end()
 " Gruvbox
 colorscheme gruvbox
 set background=dark
-let g:airline_theme='gruvbox'
+"let g:airline_theme='gruvbox'
+let g:airline_theme='angr'
 
 " coc.vim
 let g:coc_global_extensions = [

@@ -45,5 +45,7 @@
     "explorer.file.showHiddenFiles": true,
     "explorer.previewAction.onHover": false,
     "explorer.icon.enableNerdfont": true,
-    "explorer.icon.source": "builtin"
+    "explorer.icon.source": "builtin",
+    "java.saveActions.organizeImports": true,
+    "java.format.settings.url": "~/workspace/devconf/java/eclipse-java-google-style.xml"
 }
