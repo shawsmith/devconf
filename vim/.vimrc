@@ -77,6 +77,9 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'morhetz/gruvbox'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
 
 call plug#end()
 
@@ -250,3 +253,9 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 noremap tt :CocCommand explorer<CR>
+
+"fzf
+let g:fzf_preview_window = ['hidden,right,50%,<70(up,40%)', 'ctrl-/']
+command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, <bang>0)
+command! -bang ProjectFiles call fzf#vim#files('~/codebase', <bang>0)
+noremap <LEADER>f :FZF<CR>
