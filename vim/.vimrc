@@ -148,13 +148,15 @@ nmap <silent> gr <Plug>(coc-references)
 " Use K to show documentation in preview window
 nnoremap <silent> K :call ShowDocumentation()<CR>
 
-function! ShonDocumentation()
+function! ShowDocumentation()
   if CocAction('hasProvider', 'hover')
     call CocActionAsync('doHover')
   else
     call feedkeys('K', 'in')
   endif
 endfunction
+
+autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
 
 " Highlight the symbol and its references when holding the cursor
 " autocmd CursorHold * silent call CocActionAsync('highlight')
