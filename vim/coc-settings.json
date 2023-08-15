@@ -47,5 +47,5 @@
     "explorer.icon.enableNerdfont": true,
     "explorer.icon.source": "builtin",
     "java.saveActions.organizeImports": true,
-    "java.format.settings.url": "~/workspace/devconf/java/eclipse-java-google-style.xml"
+    "java.format.settings.url": "file:///home/sarah/.vim/eclipse-java-google-style.xml"
 }

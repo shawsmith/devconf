@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Hack Nerd Font Mono:size=24:antialias=true:autohint=true";
+static char *font = "Source Code Pro:size=26:antialias=true:autohint=true";
 static int borderpx = 2;
 
 /*
@@ -94,7 +94,7 @@ char *termname = "st-256color";
 unsigned int tabspaces = 8;
 
 /* bg opacity */
-float alpha = 0.9;
+float alpha = 0.8;
 
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
@@ -201,6 +201,10 @@ static Shortcut shortcuts[] = {
     {TERMMOD, XK_Y, selpaste, {.i = 0}},
     {ShiftMask, XK_Insert, selpaste, {.i = 0}},
     {TERMMOD, XK_Num_Lock, numlock, {.i = 0}},
+    {Mod4Mask, XK_k, kscrollup, {.i = 1}},
+    {Mod4Mask, XK_j, kscrolldown, {.i = 1}},
+    {Mod4Mask, XK_b, kscrollup, {.i = -1}},
+    {Mod4Mask, XK_f, kscrolldown, {.i = -1}},
 };
 
 /*
