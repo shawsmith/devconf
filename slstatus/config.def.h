@@ -65,13 +65,13 @@ static const char unknown_str[] = "n/a";
  */
 static const struct arg args[] = {
 	/* function 			format          argument */
-    { netspeed_rx,          "  %s ",       "wlp1s0" },
-    { netspeed_tx,          " %s | ",      "wlp1s0" },
-	{ wifi_essid,           " %s | ",      "wlp1s0" }, 
-	{ ram_free,				"󰍛 %s | ",		NULL },
-	{ disk_free,			"󰋊 %s | ",		"/" },
-	{ battery_perc, 		" %s%% ", 	    "BATT" },
-	{ battery_state,		"%s | ", 		"BATT" },
+    	{ netspeed_rx,          	"  %s ",    "wlp4s0"},
+    	{ netspeed_tx,          	" %s | ", 	"wlp4s0" },
+	{ wifi_essid,           	" %s | ",   "wlp4s0" }, 
+	{ ram_free,			"󰍛 %s | ",	NULL},
+	{ disk_free,			"󰋊 %s | ",	"/" },
+	{ battery_perc, 		" %s%% ", 	"BAT1" },
+	{ battery_state,		"%s | ", 	"BAT1" },
 	{ datetime, 			"%s | ",        "%-m月%-d日 %a %-I:%M %p" },
-	{ username, 			" %s ", 		NULL},
+	{ username, 			" %s ", 	NULL},
 };

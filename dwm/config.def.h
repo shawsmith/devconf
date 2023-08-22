@@ -19,11 +19,11 @@ static const Bool viewontag = True; /*  Switch view on tag switch */
 static const int vertpad = 0; /* vertical padding of bar */
 static const int sidepad = 0; /* horizontal padding of bar */
 static const char *fonts[] = {
-    "Source Code Pro:size=18:style=Regular:antialias=true:autohint=true",
-    "WenQuanYi Micro Hei:size=18:style=Regular:antialias=true:autohint=true",
+    "Source Code Pro:size=15:style=Regular:antialias=true:autohint=true",
+    "WenQuanYi Micro Hei:size=15:style=Regular:antialias=true:autohint=true",
     "Symbols Nerd "
-    "Font:pixelsize=18:style=2048-em:antialias=true:autohint=true"};
-static const char dmenufont[] = "Source Code Pro:size=18";
+    "Font:pixelsize=15:style=2048-em:antialias=true:autohint=true"};
+static const char dmenufont[] = "Source Code Pro:size=15";
 static const char col_gray1[] = "#222222";
 static const char col_gray2[] = "#444444";
 static const char col_gray3[] = "#bbbbbb";
