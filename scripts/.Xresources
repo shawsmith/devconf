@@ -1,0 +1,22 @@
+XTerm*renderFont: true
+XTerm*font: -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-1
+XTerm*Background: black
+XTerm*Foreground: gray90
+XTerm*allowBoldFonts: false
+XTerm.vt100.reverseVideo: false
+XTerm.vt100.bellIsUrgent: true
+
+XTerm.vt100.metaSendsEscape: true
+XTerm*geometry:	120x45
+XTerm*dynamicColors: true
+XTerm*utf8:	2
+XTerm*eightBitInput:	true
+XTerm*saveLines:	100000
+XTerm*scrollKey:	true
+XTerm*scrollTtyOutput:	false
+XTerm*scrollBar:	false
+XTerm*termName:		xterm-256color
+XTerm*selectToClipboard:	true
+XTerm*VT100.Translations: #override \
+	Ctrl Shift <Key>V:    insert-selection(SELECT) \n\
+	Ctrl Shift <Key>C:    copy-selection(SELECT)
