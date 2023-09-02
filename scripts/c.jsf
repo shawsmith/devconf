@@ -84,8 +84,8 @@
 
 
 =Background    	black / bg_black
-=CPreproc 		cyan
-=CPreprocKW 		bold cyan
+=CPreproc 		gray
+=CPreprocKW 		bold gray
 =CPreproc_cKW	bold cyan
 =CPreproc_sym	bold blue
 =CPreprocCComment	yellow
@@ -96,7 +96,7 @@
 =OpenMPcomment	yellow
 =OpenMPnonkw	red / bg_green
 =OpenMP_space	bold cyan
-=CComment		bold red
+=CComment		red
 =Special		cyan
 =Special2		green
 =GlueColor		cyan
@@ -118,7 +118,7 @@
 =STLkw			bold white
 =Identifier		white
 =Mystery		bold green / bg_red
-=TrailingSpace	black / bg_cyan
+=TrailingSpace	black / black
 
 
 ########################
