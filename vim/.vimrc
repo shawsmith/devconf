@@ -13,6 +13,8 @@ set noswapfile
 set mouse=a
 set encoding=utf-8
 let &t_ut=''
+set noerrorbells
+set vb t_vb=
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
