@@ -81,16 +81,21 @@ Plug 'morhetz/gruvbox'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-
+Plug 'ryanoasis/vim-devicons'
+Plug 'andreasvc/vim-256noir'
 
 call plug#end()
 
 
-" Gruvbox
-colorscheme gruvbox
-set background=dark
-"let g:airline_theme='gruvbox'
-let g:airline_theme='angr'
+let g:airline_theme='wombat'
+
+colorscheme 256_noir
+
+" Change highlighting of cursor line when entering/leaving Insert Mode
+set cursorline
+highlight CursorLine cterm=NONE ctermfg=NONE ctermbg=233 guifg=NONE guibg=#121212
+autocmd InsertEnter * highlight CursorLine cterm=NONE ctermfg=NONE ctermbg=234 guifg=NONE guibg=#1c1c1c
+autocmd InsertLeave * highlight CursorLine cterm=NONE ctermfg=NONE ctermbg=233 guifg=NONE guibg=#121212
 
 " coc.vim
 let g:coc_global_extensions = [
