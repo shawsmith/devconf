@@ -195,6 +195,7 @@
 	"else"		kw
 	"enum"		kw
 	"extends"	kw
+	"exports"	kw
 	"false"		lit
 	"final"		kw
 	"finally"	kw
@@ -208,14 +209,23 @@
 	"int"		type
 	"interface"	kw
 	"long"		type
+	"module"	kw
 	"native"	kw
 	"new"		operator
+	"non-sealed"	kw
 	"null"		lit
+	"open"		kw
+	"opens"		kw
 	"package"	kw
+	"permits"	kw
 	"private"	kw
 	"protected"	kw
+	"provides"	kw
 	"public"	kw
+	"record"	kw
+	"requires"	kw
 	"return"	kw
+	"sealed"	kw
 	"short"		type
 	"static"	kw
 	"strictfp"	kw
@@ -225,12 +235,17 @@
 	"this"		kw
 	"throw"		kw
 	"throws"	kw
+	"to"		kw
 	"transient"	kw
 	"true"		lit
 	"try"		kw
+	"uses"		kw
+	"var"		kw
 	"void"		kw
 	"volatile"	kw
 	"while"		kw
+	"with"		kw
+	"yield"		kw
 done
 	"a-zA-Z0-9_"	ident
 
