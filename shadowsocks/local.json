@@ -1,0 +1,9 @@
+{
+    "server":["c2s1.jjcruises.com", "c2s2.jjcruises.com"],
+    "mode":"tcp_and_udp",
+    "server_port":37786,
+    "local_port":1081,
+    "password":"FsbM6ontYQ",
+    "timeout":86400,
+    "method":"aes-256-gcm"
+}
