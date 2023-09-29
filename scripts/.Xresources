@@ -1,13 +1,14 @@
 XTerm*renderFont: true
-XTerm*font: -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-1
+XTerm*faceName: SauceCodePro\ Nerd\ Font\ Mono
+XTerm*faceSize: 16
 XTerm*Background: black
-XTerm*Foreground: gray90
+XTerm*Foreground: gray
 XTerm*allowBoldFonts: false
 XTerm.vt100.reverseVideo: false
-XTerm.vt100.bellIsUrgent: true
+XTerm.vt100.bellIsUrgent: false
 
 XTerm.vt100.metaSendsEscape: true
-XTerm*geometry:	120x45
+XTerm*geometry:	90x30
 XTerm*dynamicColors: true
 XTerm*utf8:	2
 XTerm*eightBitInput:	true
