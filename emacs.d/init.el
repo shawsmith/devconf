@@ -9,6 +9,7 @@
 (blink-cursor-mode 0)
 (global-hl-line-mode 1)
 (setq visible-cursor nil)
+(setq ring-bell-function 'ignore)
 (column-number-mode)
 (global-display-line-numbers-mode t)
 (electric-pair-mode 1)
@@ -35,9 +36,9 @@
 (add-hook 'write-file-functions 'delete-trailing-whitespace)
 
 ;;; Font configuration.
-(defvar efs/default-font-family "Source Code Pro")
-(defvar efs/default-font-size 220)
-(defvar efs/default-variable-font-size 220)
+(defvar efs/default-font-family "Hack Nerd Font Mono")
+(defvar efs/default-font-size 180)
+(defvar efs/default-variable-font-size 180)
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
 		    :height efs/default-font-size
@@ -121,7 +122,7 @@
          :map ivy-switch-buffer-map
          ("C-k" . ivy-previous-line)
          ("C-l" . ivy-done)
-	     ("C-d" . ivy-switch-buffer-kill)
+	 ("C-d" . ivy-switch-buffer-kill)
          :map ivy-reverse-i-search-map
          ("C-k" . ivy-previous-line)
          ("C-d" . ivy-reverse-i-search-kill))
@@ -222,8 +223,7 @@
   :ensure t
   :commands (lsp lsp-deferred)
   :hook ((c-mode . lsp-deferred)
-	 (c++-mode . lsp-deferred)
-	 (java-mode . lsp-deferred))
+	 (c++-mode . lsp-deferred))
   :init
   (setq lsp-keymap-prefix "C-c l"))
 
@@ -235,8 +235,6 @@
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 (add-hook 'lsp-mode-hook #'lsp-install-save-hooks)
 
-(use-package lsp-java
-  :ensure t)
 
 (use-package treemacs
   :ensure t
@@ -362,16 +360,3 @@
 (use-package lsp-ivy
   :ensure t
   :after lsp-mode)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(lsp-ivy lsp-ui treemacs-magit treemacs-projectile treemacs-evil lsp-java lsp-mode exec-path-from-shell company flycheck yasnippet-snippets yasnippet evil-nerd-commenter magit counsel-projectile projectile evil-collection evil general counsel ivy-rich drag-stuff hungry-delete ace-window rainbow-delimiters all-the-icons zenburn-theme restart-emacs)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
