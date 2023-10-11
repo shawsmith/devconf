@@ -152,55 +152,9 @@
     :prefix "SPC"
     :global-prefix "C-SPC"))
 
-(use-package evil
-  :ensure t
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-C-i-jump nil)
-  :config
-  (evil-mode 0)
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join))
-
-(use-package evil-collection
-  :ensure t
-  :after evil
-  :config
-  (evil-collection-init))
-
-(use-package projectile
-  :ensure t
-  :diminish projectile-mode
-  :custom ((projectile-completion-system 'ivy))
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  :init
-  (when (file-directory-p "~/codebase")
-    (setq projectile-project-search-path '("~/codebase")))
-  (setq projectile-switch-project-action #'projectile-dired))
-
-(use-package counsel-projectile
-  :ensure t
-  :after projectile)
-
-(use-package magit
-  :ensure t
-  :commands magit-status
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
 (use-package evil-nerd-commenter
   :ensure t
   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
-(use-package yasnippet
-  :ensure t
-  :config (yas-global-mode))
-
-(use-package yasnippet-snippets
-  :ensure t)
 
 (use-package flycheck
   :ensure t
@@ -218,145 +172,20 @@
   :ensure t
   :init (exec-path-from-shell-initialize))
 
-
-(use-package lsp-mode
-  :ensure t
-  :commands (lsp lsp-deferred)
-  :hook ((c-mode . lsp-deferred)
-	 (c++-mode . lsp-deferred))
-  :init
-  (setq lsp-keymap-prefix "C-c l"))
-
-(global-set-key (kbd "M-s-l") 'lsp-format-buffer)
-
-
-(defun lsp-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(add-hook 'lsp-mode-hook #'lsp-install-save-hooks)
-
-
-(use-package treemacs
-  :ensure t
-  :defer t
-  :init
-  (with-eval-after-load 'winum
-    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+(use-package eglot
+  :hook ((c-mode
+          c++-mode
+          java-mode
+          ;; rust-mode
+          ) . eglot-ensure)
+  :bind (("C-c e f" . #'eglot-format)
+         ("C-c e a" . #'eglot-code-actions)
+         ("C-c e i" . #'eglot-code-action-organize-imports)
+         ("C-c e q" . #'eglot-code-action-quickfix))
   :config
-  (progn
-    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
-          treemacs-deferred-git-apply-delay      0.5
-          treemacs-directory-name-transformer    #'identity
-          treemacs-display-in-side-window        t
-          treemacs-eldoc-display                 t
-          treemacs-file-event-delay              5000
-          treemacs-file-extension-regex          treemacs-last-period-regex-value
-          treemacs-file-follow-delay             0.2
-          treemacs-file-name-transformer         #'identity
-          treemacs-follow-after-init             t
-          treemacs-expand-after-init             t
-          treemacs-git-command-pipe              ""
-          treemacs-goto-tag-strategy             'refetch-index
-          treemacs-indentation                   2
-          treemacs-indentation-string            " "
-          treemacs-is-never-other-window         nil
-          treemacs-max-git-entries               5000
-          treemacs-missing-project-action        'ask
-          treemacs-move-forward-on-expand        nil
-          treemacs-no-png-images                 nil
-          treemacs-no-delete-other-windows       t
-          treemacs-project-follow-cleanup        nil
-          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-          treemacs-position                      'left
-          treemacs-read-string-input             'from-child-frame
-          treemacs-recenter-distance             0.1
-          treemacs-recenter-after-file-follow    nil
-          treemacs-recenter-after-tag-follow     nil
-          treemacs-recenter-after-project-jump   'always
-          treemacs-recenter-after-project-expand 'on-distance
-          treemacs-litter-directories            '("/node_modules" "/.venv" "/.cask")
-          treemacs-show-cursor                   nil
-          treemacs-show-hidden-files             t
-          treemacs-silent-filewatch              nil
-          treemacs-silent-refresh                nil
-          treemacs-sorting                       'alphabetic-asc
-          treemacs-space-between-root-nodes      t
-          treemacs-tag-follow-cleanup            t
-          treemacs-tag-follow-delay              1.5
-          treemacs-user-mode-line-format         nil
-          treemacs-user-header-line-format       nil
-          treemacs-width                         30
-          treemacs-width-is-initially-locked     nil
-          treemacs-workspace-switch-cleanup      nil)
-    (treemacs-resize-icons 18)
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null treemacs-python-executable)))
-      (`(t . t)
-       (treemacs-git-mode 'deferred))
-      (`(t . _)
-       (treemacs-git-mode 'simple))))
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("C-x t t"   . treemacs)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
-
-(add-hook 'treemacs-mode-hook (lambda() (display-line-numbers-mode -1)))
-
-(with-eval-after-load 'treemacs
-  (defun treemacs-custom-filter (file _)
-    (or (s-ends-with? ".class" file)
-	(s-ends-with? ".log" file)
-	(s-ends-with? ".lock" file)
-        (s-ends-with? ".settings" file)
-        (s-ends-with? ".classpath" file)
-        (s-ends-with? ".project" file)))
-  (push #'treemacs-custom-filter treemacs-ignored-file-predicates))
-
-(use-package lsp-treemacs
-  :ensure t
-  :after (lsp-mode treemacs)
-  :commands lsp-treemacs-errors-list
-  :bind (:map lsp-mode-map
-		  ("M-9" . lsp-treemacs-errors-list)))
-(setq lsp-treemacs-sync-mode 1)
-
-(use-package treemacs-evil
-  :after (treemacs evil)
-  :ensure t)
-
-(use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
-
-(use-package treemacs-magit
-  :after (treemacs magit)
-  :ensure t)
-
-(add-hook 'lsp-mode-hook #'lsp-lens-mode)
-
-;;; Setup java shortcut keys
-(global-set-key (kbd "M-s-b") 'lsp-find-definition)
-(global-set-key (kbd "M-s-t") 'lsp-find-type-definition)
-(global-set-key (kbd "<M-s-left>") 'switch-to-prev-buffer)
-(global-set-key (kbd "<M-s-right>") 'switch-to-next-buffer)
-(global-set-key (kbd "M-s-r") 'lsp-rename)
-(global-set-key (kbd "M-s-o") 'lsp-organize-imports)
-(global-set-key (kbd "M-RET") 'lsp-java-add-import)
-
-(use-package lsp-ui
-  :ensure t
-  :after (lsp-mode)
-  :bind (:map lsp-ui-mode-map
-              ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-              ([remap xref-find-references] . lsp-ui-peek-find-references))
-  :init (setq lsp-ui-doc-enable nil
-	          lsp-ui-sideline-enable nil))
-(add-hook 'lsp-ui-doc-mode-hook #'(lambda()(display-line-numbers-mode -1)))
-
-(use-package lsp-ivy
-  :ensure t
-  :after lsp-mode)
+  (defun eglot-actions-before-save()
+    (add-hook 'before-save-hook
+              (lambda ()
+                (call-interactively #'eglot-format)
+                (call-interactively #'eglot-code-action-organize-imports))))
+  (add-hook 'eglot--managed-mode-hook #'eglot-actions-before-save))
