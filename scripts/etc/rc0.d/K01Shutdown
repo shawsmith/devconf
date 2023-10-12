@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Shutting down the computer..."
+kill $(ps aux | grep nvidia-persistenced | grep -v grep | awk '{print $2}')
