@@ -1,299 +1,754 @@
 # JOE syntax highlight file for JAVA
 
-# Needs: \uXXXX for unicode in strings
-# improve escape parsing
+# A (deterministic) state machine which performs lexical analysis of C.
+# (This is the "assembly language" of syntax highlighting.  A separate
+# program could be used to convert a regular expression NFA syntax into this
+# format).
 
-=Idle
-=Comment 	green
-=CommentLabel	bold green
-=Constant 	cyan
-=Escape 	bold cyan
-=Type 		bold
-=Keyword 	bold
-=Operator	bold
-=Bad		bold red
-=Brace		magenta
-=Control	
+# Each state begins with ':<name> <color-name>'
+# <color-name> is the color used for characters eaten by the state
+# (really a symbol for a user definable color).
 
-=Methods
+# The first state defined is the initial state.
 
-:begin Idle
-	*	begin	noeat call=.java()
+# Within a state, define transitions (jumps) to other states.  Each
+# jump has the form: <character-list> <target-state> [<option>s]
 
+# There are two ways to specify <character-list>s, either * for any
+# character not otherwise specified, or a literal list of characters within
+# quotes (ranges and escape sequences allows).  When the next character
+# matches any in the list, a jump to the target-state is taken and the
+# character is eaten (we advance to the next character of the file to be
+# colored).
 #
-# Java as a subroute- for use as java script in html
+# The * transition should be the first transition specified in the state.
 #
+# There are several options:
+#   noeat       do not eat the character, instead feed it to the next state
+#               (this tends to make the states smaller, but be careful: you
+#       can make infinite loops).
+#
+#   recolor=-N  Recolor the past N characters with the color of the
+#       target-state.  For example once /* is recognized as the
+#       start of C comment, you want to color the /* with the C
+#       comment color.
+#
+#   buffer      start copying characters to a buffer, beginning with this
+#       one (it's ok, to not terminate buffering with a matching
+#       'strings' option- the buffer is limited to leading 19
+#       characters).
+#
+#   strings A list of strings follows.  If the buffer matches any of the
+#       given strings, a jump to the target-state in the string list
+#       is taken instead of the normal jump.
+#
+#   istrings    Same as strings, but case is ignored.
+#
+#   The format of the string list is:
+#
+#      "string"   <target-state>
+#      "string"   <target-state>
+#      done
+#
+# Weirdness: only states have colors, not transitions.  This means that you
+# sometimes have to make dummy states with '* next-state noeat' just to get
+# a color specification.
 
-.subr java
+# Define no. sync lines
+# You can say:
+# -200     means 200 lines
+# -        means always start parsing from beginning of file when we lose sync
+#          if nothing is specified, the default is -50
+# THIS SETTING IS IGNORED BY Ad-hoc programming editor for DOSBox.
+-3000
 
-:idle Idle
-	*		idle
-	"\n"		idle
-	"/"		slash
-	"0"		first_digit	recolor=-1
-	"1-9"		decimal		recolor=-1
-	"."		maybe_float
-	"\""		string		recolor=-1
-	"'"		char		recolor=-1
-	"a-zA-Z_"	ident		mark buffer
-	"{}"		brace		recolor=-1
-	",:;=()><[]*&|!~+\-%^"	control	recolor=-1
 
-:maybe_done Control
-	*		idle		noeat
-	"/"		idle		noeat return recolor=-2
+# Define colors
+#
+# Colors 
+# white cyan magenta blue yellow green red black
+# bg_white bg_cyan bg_magenta bg_blue bg_yellow bg_green bg_red bg_black
+# THIS SETTING IS DIFFERENT IN Ad-hoc programming editor for DOSBox.
+# OUR COLORS ARE 8-BIT HEXADECIMAL NUMBERS:
+#   IRGBirgb
+#   \\\\\\\\_bit 0: blue for foreground
+#    \\\\\\\_bit 1: green for foreground
+#     \\\\\\_bit 2: red for foreground
+#      \\\\\_bit 3: intensity bit for foreground
+#       \\\\_bit 4: blue for background
+#        \\\_bit 5: green for background
+#         \\_bit 6: red for background
+#          \_bit 7: intensity bit for background
+# For example, 03 = black background, cyan foreground.
 
-:brace Brace
-	*		idle		noeat
 
-:control Control
-	*		idle		noeat
 
-:slash Idle
-	*		idle		noeat
-	"*"		comment		recolor=-2
-	"/"		line_comment	recolor=-2
+=Background    	black / bg_black
+=CPreproc 		gray
+=CPreprocKW 		bold gray
+=CPreproc_cKW	bold cyan
+=CPreproc_sym	bold blue
+=CPreprocCComment	yellow
+=CPreprocUnknown	gray 
+=OpenMP			green
+=OpenMPkw		bold green
+=OpenMPkw2		bold green
+=OpenMPcomment	yellow
+=OpenMPnonkw	red / bg_green
+=OpenMP_space	bold cyan
+=CComment		gray
+=Special		cyan
+=Special2		green
+=GlueColor		cyan
+=AssignColor	bold green
+=Numeric		bold blue
+=InvalidNumber	bold magenta / bg_red
+=NumericSuffix	magenta
+=String			bold green
+=StringContent	green
+=WString		bold blue
+=WStringContent	cyan
+=Char			bold magenta
+=CharContent	magenta
+=WChar			bold blue
+=WCharContent	cyan
+=AbruptStringTermination	bold green / bg_red
+=CKeyword		bold white
+=CType			bold white
+=STLkw			bold white
+=Identifier		white
+=Mystery		bold green / bg_red
+=TrailingSpace	black / black
 
-:comment Comment
-	*		comment
-	# might be TODO label
-	"BFHNTX"	comment		noeat call=.comment_todo()
-	"*"		maybe_end_comment
+########################
+# The rules begin here.
+:newline Background
+    *       idle noeat
+    "@"	    pre_hash recolor=-1
+    "#"     pre_hash recolor=-1
+    " \t"   newline_space
+:newline_space Background
+    *       newline noeat
+    "\n"        trailing_space recolor=-2
 
-:maybe_end_comment Comment
-	*		comment		noeat
-	"/"		idle
-	"*"		maybe_end_comment
-
-:line_comment Comment
-	*		line_comment
-	# might be TODO label
-	"BFHNTX"	line_comment	noeat call=.comment_todo()
-	"\n"		idle
-
-:first_digit Constant
-	*		idle		noeat
-	"xX"		hex
-	"."		float
-	"eE"		epart
-	"0-7"		octal
-	"89"		bad_number	recolor=-1
-
-:bad_number Bad
-	*		idle		noeat
-	"0-9"		bad_number
-
-:octal Constant
-	*		idle		noeat
-	"0-7"		octal
-	"89"		bad_number	recolor=-1
-
-:hex Constant
-	*		idle		noeat
-	"0-9A-Fa-f"	hex
-
-:decimal Constant
-	*		idle		noeat
-	"0-9"		decimal
-	"eE"		epart
-	"."		float
-
-:maybe_float Constant
-	*		idle		recolor=-2 noeat
-	"0-9"		float		recolor=-2
-
-:float Constant
-	*		idle		noeat
-	"eE"		epart
-	"0-9"		float
-
-:epart Constant
-	*		idle		noeat
-	"0-9+\-"	enum
-
-:enum Constant
-	*		idle		noeat
-	"0-9"		enum
-
-:string	Constant
-	*		string
-	"\""		idle
-	"\\"		string_escape	recolor=-1
-	"%"		string_control	recolor=-1
-
-:string_escape Escape
-	*		string
-	"x"		string_hex1
-	"0-7"		string_octal2
-	"\n"		string		recolor=-2
-
-:string_hex1 Escape
-	*		string		noeat
-	"0-9a-fA-F"	string_hex2
-
-:string_hex2 Escape
-	*		string		noeat
-	"0-9a-fA-F"	string
-
-:string_octal2 Escape
-	*		string		noeat
-	"0-7"		string_octal3
-
-:string_octal3 Escape
-	*		string		noeat
-	"0-7"		string
-
-:string_control Escape
-	*		string_control
-	"\n"		reset
-	"diouxXeEfFgGaAcspn%SC"	string
-
-:char Constant
-	*		char
-	"\n"		reset
-	"'"		idle
-	"\\"		char_escape	recolor=-1
-
-:char_escape	Escape
-	*		char
-	"x"		char_hex1
-	"0-7"		char_octal2
-	"\n"		char		recolor=-2
-
-:char_hex1 Escape
-	*		char		noeat
-	"0-9a-fA-F"	char_hex2
-
-:char_hex2 Escape
-	*		char		noeat
-	"0-9a-fA-F"	char
-
-:char_octal2 Escape
-	*		char		noeat
-	"0-7"		char_octal3
-
-:char_octal3 Escape
-	*		char		noeat
-	"0-7"		char
-
-:ident Idle
-	*		ident_end	noeat markend strings
-	"abstract"	kw
-	"assert"	kw
-	"boolean"	type
-	"break"		kw
-	"byte"		type
-	"case"		kw
-	"catch"		kw
-	"char"		type
-	"class"		kw
-	"const"		bad_kw
-	"continue"	kw
-	"default"	kw
-	"do"		kw
-	"double"	type
-	"else"		kw
-	"enum"		kw
-	"extends"	kw
-	"exports"	kw
-	"false"		lit
-	"final"		kw
-	"finally"	kw
-	"float"		type
-	"for"		kw
-	"goto"		bad_kw
-	"if"		kw
-	"implements"	kw
-	"import"	kw
-	"instanceof"	operator
-	"int"		type
-	"interface"	kw
-	"long"		type
-	"module"	kw
-	"native"	kw
-	"new"		operator
-	"non-sealed"	kw
-	"null"		lit
-	"open"		kw
-	"opens"		kw
-	"package"	kw
-	"permits"	kw
-	"private"	kw
-	"protected"	kw
-	"provides"	kw
-	"public"	kw
-	"record"	kw
-	"requires"	kw
-	"return"	kw
-	"sealed"	kw
-	"short"		type
-	"static"	kw
-	"strictfp"	kw
-	"super"		kw
-	"switch"	kw
-	"synchronized"	kw
-	"this"		kw
-	"throw"		kw
-	"throws"	kw
-	"to"		kw
-	"transient"	kw
-	"true"		lit
-	"try"		kw
-	"uses"		kw
-	"var"		kw
-	"void"		kw
-	"volatile"	kw
-	"while"		kw
-	"with"		kw
-	"yield"		kw
+:pre_hash CPreprocKW
+    *       pre noeat
+:pre CPreproc
+    *       preident recolor=-1 buffer
+    "/"     pre1_slash recolor=-1
+    " \t"       pre
+    "\n"        newline
+:preident CPreprocUnknown
+    *       preproc noeat strings
+    "define"    preproc_known
+    "elif"      preproc_known
+    "else"      preproc_known
+    "endif"     preproc_known
+    "error"     preproc_known
+    "if"        preproc_known
+    "ifdef"     preproc_known
+    "ifndef"    preproc_known
+    "include"   preproc_known
+    "include_next"  preproc_known
+    "line"      preproc_known
+    "pragma"    preproc_pragma
+    "undef"     preproc_known
+    "warning"   preproc_known
 done
-	"a-zA-Z0-9_"	ident
+    "a-z$0-9A-Z_"   preident
 
-:type Type
-	*		idle		noeat
-
-:kw Keyword
-	*		idle		noeat
-
-:bad_kw Bad
-	*		idle		noeat
-
-:lit Constant
-	*		idle		noeat
-
-:operator Operator
-	*		idle		noeat
-
-:ident_end Idle
-	*		idle		noeat
-	" "		ident_end
-	"("		method_end	noeat recolormark
-
-:method_end Methods
-	*		idle		noeat
-
-.end
-
-.subr comment_todo
-# initial state
-:comment_todo_init Comment
-	*		comment_todo_guess	buffer
-
-# highlight common TODO labels
-:comment_todo_guess Comment
-	*		comment_todo_unknown	noeat strings
-	"BUG"		comment_todo
-	"FIXME"		comment_todo
-	"HACK"		comment_todo
-	"NOTE"		comment_todo
-	"TODO"		comment_todo
-	"XXX"		comment_todo
+# CPreprocessor directives that begin with an actual keyword
+:preproc_known CPreprocKW
+    *       preproc noeat
+:preproc CPreproc
+    *       preproc
+    " \t"   preproc_space
+    "\n"        newline
+    "a-z$A-Z_"  preproc_ident recolor=-1 buffer
+    "-()?~[]{},;:!<>=+*%&|^" preproc_sym recolor=-1 noeat
+    "/"         pre2_slash recolor=-1
+    "\""        pre2_string recolor=-1
+    "'"     pre2_char recolor=-1
+    "\\"        preproc_cont recolor=-1
+:preproc_space CPreproc
+    *       preproc noeat
+    "\n"        trailing_space recolor=-2
+:preproc_sym CPreproc_sym
+    *       preproc
+:preproc_cont CPreproc_sym
+    *       preproc_cont
+    "\n"        preproc_newline
+:preproc_newline Background
+    *       preproc noeat
+    " \t"   preproc_newline_space
+:preproc_newline_space CPreproc
+    *       preproc_newline noeat
+    "\n"        trailing_space recolor=-2
+:preproc_ident CPreproc
+    *       preproc noeat strings
+    "auto"      preproc_ident_known
+    "char"      preproc_ident_known
+    "const"     preproc_ident_known
+    "decltype"  preproc_ident_known
+    "double"    preproc_ident_known
+    "enum"      preproc_ident_known
+    "extern"    preproc_ident_known
+    "float"     preproc_ident_known
+    "inline"    preproc_ident_known
+    "int"       preproc_ident_known
+    "long"      preproc_ident_known
+    "register"  preproc_ident_known
+    "short"     preproc_ident_known
+    "signed"    preproc_ident_known
+    "static"    preproc_ident_known
+    "struct"    preproc_ident_known
+    "typedef"   preproc_ident_known
+    "union"     preproc_ident_known
+    "unsigned"  preproc_ident_known
+    "void"      preproc_ident_known
+    "volatile"  preproc_ident_known
+    "break"     preproc_ident_known
+    "case"      preproc_ident_known
+    "continue"  preproc_ident_known
+    "default"   preproc_ident_known
+    "do"        preproc_ident_known
+    "else"      preproc_ident_known
+    "for"       preproc_ident_known
+    "goto"      preproc_ident_known
+    "if"        preproc_ident_known
+    "return"    preproc_ident_known
+    "sizeof"    preproc_ident_known
+    "switch"    preproc_ident_known
+    "while"     preproc_ident_known
+    "bitand"    preproc_ident_known   #c++
+    "bitor"     preproc_ident_known   #c++
+    "catch"     preproc_ident_known   #c++
+    "compl"     preproc_ident_known   #c++
+    "delete"        preproc_ident_known   #c++
+    "explicit"  preproc_ident_known   #c++
+    "export"    preproc_ident_known   #c++
+    "false"     preproc_ident_known   #c++
+    "friend"        preproc_ident_known   #c++
+    "namespace"     preproc_ident_known   #c++
+    "new"           preproc_ident_known   #c++
+    "not"       preproc_ident_known   #c++
+    "not_eq"    preproc_ident_known   #c++
+    "operator"  preproc_ident_known   #c++
+    "or"        preproc_ident_known   #c++
+    "or_eq"     preproc_ident_known   #c++
+    "private"   preproc_ident_known   #c++
+    "protected" preproc_ident_known   #c++
+    "public"    preproc_ident_known   #c++
+    "throw"     preproc_ident_known   #c++
+    "true"      preproc_ident_known   #c++
+    "try"       preproc_ident_known   #c++
+    "using"         preproc_ident_known   #c++
+    "virtual"   preproc_ident_known   #c++
+    "xor"       preproc_ident_known   #c++
+    "xor_eq"    preproc_ident_known   #c++
 done
-	"A-Z"		comment_todo_guess
+    "a-z$A-Z0-9_"   preproc_ident
+:preproc_ident_known CPreproc_cKW
+    *       preproc noeat
 
-:comment_todo_unknown Comment
-	*		NULL		noeat return
+:pre2_slash CPreproc_sym
+    *       preproc recolor=-1
+    "*"     pre2_comment        recolor=-2
+    "/"     pre2_line_comment   recolor=-2
+:pre2_comment CPreprocCComment
+    *       pre2_comment
+    "*"     pre2_comment_maybe_end
+:pre2_comment_maybe_end CPreprocCComment
+    *       pre2_comment
+    "/"     preproc
+    "*"     pre2_comment_maybe_end
+:pre2_line_comment CPreprocCComment
+    *       pre2_line_comment
+    "\\"        pre2_line_comment_escape
+    "\n"        newline
+:pre2_line_comment_escape CPreprocCComment
+    *       pre2_line_comment
+:pre2_string CPreproc_sym
+    *       pre2_string
+    "\""        preproc
+    "\\"        pre2_string_escape
+:pre2_string_escape CPreproc_sym
+    *       pre2_string
+:pre2_char CPreproc_sym
+    *       pre2_char
+    "'"     preproc
+    "\\"        pre2_char_escape
+:pre2_char_escape CPreproc_sym
+    *       pre2_char
 
-:comment_todo CommentLabel
-	*		NULL		noeat return
-.end
+# CPreprocessor directives that just begin with #, no keyword
+:pre1_slash CPreprocUnknown
+    *       pre recolor=-1
+    "*"     pre1_comment        recolor=-2
+    "/"     pre1_line_comment   recolor=-2
+:pre1_comment CPreprocCComment
+    *       pre1_comment
+    " "     pre1_comment_space
+    "*"     pre1_comment_maybe_end
+:pre1_comment_space CPreprocCComment
+    *       pre1_comment noeat
+    "\n"        pre1_comment_trailing_space recolor=-2
+:pre1_comment_trailing_space TrailingSpace
+    *       pre1_comment noeat
+:pre1_comment_maybe_end CPreprocCComment
+    *       pre1_comment
+    "/"     pre
+    "*"     pre1_comment_maybe_end
+:pre1_line_comment CPreprocCComment
+    *       pre1_line_comment
+    "\\"        pre1_line_comment_escape
+    "\n"        newline
+:pre1_line_comment_escape CPreprocCComment
+    *       pre1_line_comment
+
+
+# Special care about OpenMP #pragma constructs
+:preproc_pragma CPreprocKW
+    *       preproc_pragma0 noeat
+:preproc_pragma0 CPreproc
+    *       preproc noeat
+    " "     preproc_pragma0
+    "o"     openmp1
+:openmp1 CPreproc
+    *       preproc noeat
+    "m"     openmp2
+:openmp2 CPreproc
+    *       preproc noeat
+    "p"     openmp3
+:openmp3 CPreproc
+    *       preproc noeat
+    " "     openmp_keyword_known recolor=-12
+
+:openmp OpenMP
+    *       openmp
+    " \t"   openmp_space recolor=-1
+    "("     openmp_parens
+    "\\"        openmp_cont
+    "a-z_"      openmp_keyword recolor=-1 buffer
+    "/"     openmp_slash
+    "\n"        newline
+:openmp_space OpenMP_space
+    *       openmp noeat
+    "\n"        trailing_space recolor=-2
+:openmp_slash OpenMP
+    *       openmp
+    "*"     openmp_comment recolor=-2
+    "/"     openmp_line_comment recolor=-2
+:openmp_comment OpenMPcomment
+    *       openmp_comment
+    "*"     openmp_comment_maybe_end
+:openmp_comment_maybe_end OpenMPcomment
+    *       openmp_comment
+    "*"     openmp_comment_maybe_end
+    "/"     openmp
+:openmp_line_comment OpenMPcomment
+    *       openmp_line_comment
+    "\\"        openmp_line_comment_escape
+    "\n"        newline
+:openmp_line_comment_escape OpenMPcomment
+    *       openmp_line_comment
+
+:openmp_parens OpenMP
+    *       openmp_parens
+    "\\"        openmp_parens_cont
+    "/"     openmp_parens_slash
+    ")"     openmp
+    "\n"        newline
+:openmp_cont OpenMP
+    *       openmp
+:openmp_parens_cont OpenMP
+    *       openmp_parens
+:openmp_parens_slash OpenMP
+    *       openmp_parens noeat
+    "*"     openmp_parens_comment recolor=-2
+:openmp_parens_comment OpenMPcomment
+    *       openmp_parens_comment
+    "*"     openmp_parens_comment_maybe_end
+:openmp_parens_comment_maybe_end OpenMPcomment
+    *       openmp_parens_comment
+    "*"     openmp_parens_comment_maybe_end
+    "/"     openmp_parens
+
+:openmp_keyword OpenMPnonkw
+    *       openmp noeat strings
+    "atomic"    openmp_keyword_known2
+    "barrier"   openmp_keyword_known2
+    "collapse"  openmp_keyword_known
+    "copyin"    openmp_keyword_known
+    "copyprivate"   openmp_keyword_known
+    "critical"  openmp_keyword_known2
+    "default"   openmp_keyword_known_do_parens
+    "dynamic"   openmp_keyword_known_end_parens
+    "firstprivate"  openmp_keyword_known
+    "for"       openmp_keyword_known2
+    "flush"     openmp_keyword_known2
+    "guided"    openmp_keyword_known_end_parens
+    "if"        openmp_keyword_known
+    "lastprivate"   openmp_keyword_known
+    "master"    openmp_keyword_known2
+    "nowait"    openmp_keyword_known
+    "none"      openmp_keyword_known_end_parens
+    "num_threads"   openmp_keyword_known
+    "ordered"   openmp_keyword_known2
+    "parallel"  openmp_keyword_known2
+    "private"   openmp_keyword_known_end_parens
+    "reduction" openmp_keyword_known
+    "schedule"  openmp_keyword_known_do_parens
+    "section"   openmp_keyword_known2
+    "sections"  openmp_keyword_known2
+    "shared"    openmp_keyword_known_end_parens
+    "single"    openmp_keyword_known2
+    "static"    openmp_keyword_known_end_parens
+    "task"      openmp_keyword_known2
+    "taskwait"  openmp_keyword_known
+    "threadprivate" openmp_keyword_known
+    "untied"    openmp_keyword_known
+done
+    "a-z0-9A-Z_"    openmp_keyword
+:openmp_keyword_known OpenMPkw
+    *       openmp noeat
+:openmp_keyword_known2 OpenMPkw2
+    *       openmp noeat
+:openmp_keyword_known_do_parens OpenMPkw
+    *       openmp noeat
+    "("     openmp_keyword_known_do_parens1 recolor=-1
+:openmp_keyword_known_end_parens OpenMPkw
+    *       openmp_keyword_known_end_parens1 noeat
+:openmp_keyword_known_end_parens1 OpenMP
+    *       openmp noeat
+    " "     openmp_keyword_known_end_parens1
+    ","     openmp_parens
+:openmp_keyword_known_do_parens1 OpenMP
+    *       openmp_parens noeat
+        "a-z_"          openmp_keyword recolor=-1 buffer
+
+# All following states are for when we're not in a preprocessor line
+
+:idle Background
+    *       idle_mystery    recolor=-1
+    "()?~"      special     recolor=-1
+    "[]{},;"    special2    recolor=-1
+    ":"     maybe_glue  recolor=-1
+    "!<>"       maybe_comp  recolor=-1
+    "="     maybe_comp_eq   recolor=-1
+    "-+*%&|^"   maybe_op_assign recolor=-1
+    " \t"   space       recolor=-1
+    "/"     slash       recolor=-1
+    "0"     first_digit_0   recolor=-1
+    "1-9"       first_digit recolor=-1
+    "."     period      recolor=-1
+    "\""        stringbegin recolor=-1 noeat
+    "'"     charbegin   recolor=-1 noeat
+    "a-z$A-Z_"  ident       recolor=-1 buffer
+    "L"     maybe_wide      recolor=-1 buffer
+    "\n"        newline recolor=-1
+:idle_mystery Mystery
+    *       idle noeat
+:space Background
+        *               idle noeat
+        "\n"        trailing_space recolor=-2
+:trailing_space TrailingSpace
+    *       newline noeat
+
+# Delimiters
+:special Special
+    *       idle noeat
+:special2 Special2
+    *       idle noeat
+:period Special
+    *       idle noeat
+    ":"     typoed_glue recolor=-2
+    "0-9"       float       recolor=-2
+:slash Special
+    *       idle noeat
+    "*"     comment     recolor=-2 # "/*"
+    "/"     line_comment    recolor=-2 # "//"
+    "="     was_op_assign   recolor=-2 # "/="
+
+# "::"
+:maybe_glue Special
+    *       idle noeat
+    "."     typoed_glue recolor=-2
+    ":"     was_glue recolor=-2
+:was_glue GlueColor
+    *       idle noeat
+
+:typoed_glue InvalidNumber
+    *       idle noeat
+
+# "==" vs "="
+:maybe_comp_eq AssignColor
+    *       idle noeat
+    "="     was_comp recolor=-2
+# "<=", ">=", "==", "!="
+:maybe_comp Special
+    *       idle noeat
+    "="     was_comp recolor=-2
+:was_comp Special
+    *       idle noeat
+
+# "+=", "-=", "*=", "/=", "%=", "&=", "|="
+:maybe_op_assign Special
+    *       idle noeat
+    "="     was_op_assign recolor=-2
+:was_op_assign AssignColor
+    *       idle noeat
+
+
+# CComments
+:comment CComment
+    *       comment
+    " "     comment_space    
+    "*"     maybe_end_comment
+:comment_space CComment
+    *       comment noeat
+    "\n"        comment_trailing_space recolor=-2
+:comment_trailing_space TrailingSpace
+    *       comment noeat
+:maybe_end_comment CComment
+    *       comment
+    "/"     idle
+    "*"     maybe_end_comment
+:line_comment CComment
+    *       line_comment
+    "\\"        line_comment_escape
+    "\n"        newline recolor=-1
+:line_comment_escape CComment
+    *       line_comment
+
+# Numeric constants
+:first_digit_0 Numeric
+    *       first_digit noeat
+    "xX"            hex_first
+:first_digit Numeric
+    *       number_before_e noeat
+
+:hex_first Numeric
+    *       end_number_suffix noeat recolor=-2
+    "0-9A-Fa-f" hex
+    "."     hexfloat
+:hex Numeric
+    *       end_int noeat
+    "0-9A-Fa-f" hex
+    "."     hexfloat
+    "pP"        epart
+:hexfloat Numeric
+    *       end_number_suffix noeat recolor=-2
+    "0-9A-Fa-f" hexfloat
+    "pP"        epart
+:number_before_e Numeric
+    *       end_int noeat
+    "0-9"       number_before_e
+    "."     float
+    "eE"            epart
+
+:float Numeric
+    *       end_float noeat
+    "eE"        epart
+    "0-9"       float
+:epart Numeric
+    *       enum_first noeat
+    "-+"        enum_first
+:enum_first Numeric
+    *       end_number_suffix noeat recolor=-2
+    "0-9"       enum
+:enum Numeric
+    *       end_float noeat
+    "0-9"       enum
+:end_float NumericSuffix
+    *       end_number_suffix noeat
+    "fFlL"      end_number_suffix #f, #l
+:end_int NumericSuffix
+    *       end_number_suffix noeat
+    "uU"        int_suffix_u    #u
+    "lL"        int_suffix_l    #l
+:int_suffix_u NumericSuffix
+    *       end_number_suffix noeat
+    "lL"        int_suffix_ul   #ul
+:int_suffix_ul NumericSuffix
+    *       end_number_suffix noeat
+    "lL"        end_number_suffix #ull
+:int_suffix_l NumericSuffix
+    *       end_number_suffix noeat
+    "uU"        end_number_suffix  #lu
+    "lL"        int_suffix_ll   #ll
+:int_suffix_ll NumericSuffix
+    *       end_number_suffix noeat
+    "uU"        end_number_suffix #llu
+:end_number_suffix InvalidNumber
+    *       idle noeat
+    "a-z$A-Z_0-9"   end_number_suffix
+
+# Strings
+:stringbegin String
+    *       string
+:stringend String
+    *       idle
+
+:string StringContent
+    *       string
+    "\""        stringend noeat
+    "\\"        string_escape
+    "\n"        invalid_string_char_flush recolor=-2
+:string_escape StringContent
+    *       string
+    "\n"        string
+    ""       string_escape_ignore noeat
+:string_escape_ignore Background
+    *       string_escape
+
+:wstringbegin WString
+    *       wstring
+:wstringend WString
+    *       idle
+
+:wstring    WStringContent
+    *       wstring
+    "\""        wstringend noeat
+    "\\"        wstring_escape
+    "\n"        invalid_string_char_flush recolor=-2
+:wstring_escape WStringContent
+    *       wstring
+    "\n"        wstring
+    ""       wstring_escape_ignore noeat
+:wstring_escape_ignore Background
+    *       wstring_escape
+
+
+# Chars
+:charbegin Char
+    *       char
+:charend Char
+    *       idle
+
+:char CharContent
+    *       char
+    "'"     charend noeat
+    "\\"        char_escape
+    "\n"        invalid_string_char_flush recolor=-2
+:char_escape    CharContent
+    *       char
+    "\n"        char
+:char_escape_ignore Background
+    *       char_escape
+
+:wcharbegin WChar
+    *       wchar
+:wcharend WChar
+    *       idle
+:wchar WCharContent
+    *       wchar
+    "'"     wcharend noeat
+    "\\"        wchar_escape
+    "\n"        invalid_string_char_flush recolor=-2
+:wchar_escape   WCharContent
+    *       wchar
+    "\n"        wchar
+:wchar_escape_ignore Background
+    *       wchar_escape
+
+
+:maybe_wide Identifier
+    *               ident noeat
+    "'"     wcharbegin noeat recolor=-2
+    "\""        wstringbegin noeat recolor=-2
+
+
+# This is if a "\n" is met inside a string or char constant.
+# It serves two purposes:
+#   Helps getting back in sync
+#   Minimizes terminal traffic when entering strings
+:invalid_string_char_flush AbruptStringTermination
+    *       newline noeat
+
+# Special identifiers
+:ident Identifier
+    *       idle noeat strings
+    "abstract"  kw
+    "assert"	kw
+    "boolean"   type
+    "break"     kw
+    "byte"	type
+    "case"	kw
+    "char"	type
+    "class"	kw
+    "const"	kw
+    "continue"	kw
+    "default"	kw
+    "do"	kw
+    "double"	type
+    "else"	kw
+    "enum"	kw
+    "extends"	kw
+    "final"	kw
+    "finally"	kw
+    "float"	type
+    "for"	kw
+    "if"	kw
+    "goto"	kw
+    "implements" kw
+    "import"	kw
+    "instanceof" kw
+    "int"	type
+    "interface"	kw
+    "long"	type
+    "native"	kw
+    "new"	kw
+    "package"	kw
+    "private"	kw
+    "protected"	kw
+    "public"	kw
+    "return"	kw
+    "short"	type
+    "static"	kw
+    "strictfp"	kw
+    "super"	kw
+    "switch"	kw
+    "synchronized" kw
+    "this"	kw
+    "throw"	kw
+    "throws"	kw
+    "transient" kw
+    "try"	kw
+    "void"	kw
+    "volatile"	kw
+    "while"	kw	    
+    "exports"   kw
+    "module"    kw
+    "non-sealed" kw
+    "open"      kw
+    "opens"     kw
+    "permits"   kw
+    "provides"  kw
+    "record"    kw
+    "requires" 	kw
+    "sealed"	kw
+    "to"	kw
+    "transitive" kw
+    "uses"	kw
+    "var"	kw
+    "when"	kw
+    "with"	kw
+    "yield"	kw
+    
+done
+    "a-z$A-Z0-9_"   ident
+
+
+
+
+:type CType
+    *   idle noeat
+:kw CKeyword
+    *   idle noeat
+:stlkw STLkw
+    *   idle noeat
+    ":" stlkw_colon recolor=-1
+:stlkw_colon InvalidNumber
+    *   idle noeat
+    ":" was_glue recolor=-2
