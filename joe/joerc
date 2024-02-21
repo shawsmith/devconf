@@ -277,7 +277,7 @@
 				'indentc's if cursor is at first non-space
 				character.
 
-	-tab nnn		Tab width
+-tab 8		Tab width
 
 	-indentc nnn		Indentation character (32 for space, 9 for tab)
 
@@ -292,7 +292,7 @@
 
 	-crlf			File uses CR-LF at ends of lines
 
-	-wordwrap		Wordwrap
+--wordwrap		Wordwrap
 
 -nobackup		If you don't want backup file to be created
 
@@ -369,7 +369,7 @@
 
  Default local options
 -highlight
--istep 4
+-istep 8
 
  Perforce macro: use this macro (put in first column) to have joe "p4 edit"
  a file you're about to change.
