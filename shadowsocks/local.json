@@ -3,7 +3,7 @@
     "mode":"tcp_and_udp",
     "server_port":27094,
     "local_port":1081,
-    "password":"AwQ6B5",
+    "password":"ivbm3lblos",
     "timeout":86400,
     "method":"aes-256-cfb"
 }
