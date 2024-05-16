@@ -33,18 +33,13 @@ This function should only modify configuration layer settings."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(rust
-     ;; ----------------------------------------------------------------
-     ;; Example of useful layers you may want to use right away.
-     ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
-     ;; `M-m f e R' (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
      auto-completion
      better-defaults
      emacs-lisp
      git
      helm
      lsp
-     java
+     (java :variables java-backend 'lsp)
      dap
      markdown
      multiple-cursors
@@ -52,7 +47,6 @@ This function should only modify configuration layer settings."
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
-     spell-checking
      syntax-checking
      version-control
      treemacs
@@ -262,8 +256,8 @@ It should only modify the values of Spacemacs settings."
    ;; fixed-pitch faces. The `:size' can be specified as
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent. (default 10.0)
-   dotspacemacs-default-font '("Dejavu Sans Mono"
-                               :size 14.0
+   dotspacemacs-default-font '("DejaVuSansM Nerd Font Mono"
+                               :size 17.0
                                :weight normal
                                :width normal)
 
@@ -585,6 +579,9 @@ before packages are loaded."
    c-basic-offset 8
    tab-width 8
    c-default-style "linux")
+
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (global-set-key (kbd "C-x b") 'ibuffer) 
 )
 
 
