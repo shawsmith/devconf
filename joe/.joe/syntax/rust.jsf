@@ -108,18 +108,17 @@
 =StringContent	green
 =WString		bold blue
 =WStringContent	cyan
-=Char			bold magenta
-=CharContent	magenta
+=Char			#bold magenta
+=CharContent	#magenta
 =WChar			bold blue
 =WCharContent	cyan
-=AbruptStringTermination	bold green / bg_red
+=AbruptStringTermination	#bold green / bg_red
 =CKeyword		bold white
 =CType			bold white
 =STLkw			bold white
 =Identifier		white
 =Mystery		bold green / bg_red
 =TrailingSpace	black / black
-
 ########################
 # The rules begin here.
 :newline Background
