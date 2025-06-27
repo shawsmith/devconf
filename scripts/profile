@@ -52,3 +52,4 @@ export PATH
 
 alias pbcopy='xclip -sel clip'
 alias emacs='emacs -nw'
+alias s='neofetch'
