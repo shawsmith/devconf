@@ -1,4 +1,3 @@
-
 (setq inhibit-startup-message t)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -20,9 +19,8 @@
 (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-
 ;;; Tab configuration
-(defvar tab-width-size 8)
+(defvar tab-width-size 4)
 (setq-default c-basic-offset tab-width-size
               tab-width tab-width-size
               indent-tabs-mode nil)
@@ -36,9 +34,9 @@
 (add-hook 'write-file-functions 'delete-trailing-whitespace)
 
 ;;; Font configuration.
-(defvar efs/default-font-family "Source Code Pro")
-(defvar efs/default-font-size 180)
-(defvar efs/default-variable-font-size 180)
+(defvar efs/default-font-family "SauceCodePro Nerd Font Mono")
+(defvar efs/default-font-size 140)
+(defvar efs/default-variable-font-size 140)
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
 		    :height efs/default-font-size
@@ -72,7 +70,6 @@
 
 (use-package restart-emacs
   :ensure t)
-
 
 (use-package rainbow-delimiters
   :ensure t
@@ -265,21 +262,41 @@
 (use-package magit
   :ensure t)
 
+(use-package rust-mode
+  :ensure t)
+
 (use-package lsp-mode
-  :ensure t
   :init
   (setq lsp-keymap-prefix "C-c l")
-  :hook (
-         (c-mode . lsp-deferred)
-         (c++-mode . lsp-deferred)
-         (rust-mode . lsp-deferred)
+  :hook ((c-mode . lsp)
+         (c++-mode . lsp)
+         (java-mode . lsp)
+         (rust-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
 
-(use-package rust-mode
-  :ensure t
-  :init
-  (setq rust-format-on-save t))
 (add-hook 'rust-mode-hook #'lsp)
+(setq rust-format-on-save t)
 
-(add-hook 'before-save-hook #'lsp-format-buffer t)
+(use-package lsp-ui
+  :ensure t)
+
+(use-package lsp-java
+  :ensure t)
+(add-hook 'java-mode-hook #'lsp)
+
+(setq lsp-java-configuration-runtimes '[
+					                    (:name "JavaSE-21"
+						                       :path "/usr/local/jdk-21.0.2/"
+						                       :default t)])
+
+
+(require 'lsp-java-boot)
+(add-hook 'lsp-mode-hook 'lsp-lens-mode)
+(add-hook 'java-mode-hook 'lsp-java-boot-lens-mode)
+(add-hook 'before-save-hook 'lsp-format-buffer)
+(add-hook 'before-save-hook 'lsp-organize-imports)
+
+(use-package helm-lsp
+  :ensure t)
+(define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)

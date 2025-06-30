@@ -45,6 +45,10 @@ export RUSTUP_UPDATE_ROOT
 RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
 export RUSTUP_DIST_SERVER
 
+export GTK_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+export QT_IM_MODULE=ibus
+
 . "$HOME/.cargo/env"
 
 PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin
@@ -53,3 +57,4 @@ export PATH
 alias pbcopy='xclip -sel clip'
 alias emacs='emacs -nw'
 alias s='neofetch'
+

@@ -114,10 +114,11 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export GTK_IM_MODULE=ibus
-export XMODIFIERS=@im=ibus
-export QT_IM_MODULE=ibus
+#if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+#  tmux a -t default || exec tmux new -s default && exit;
+#fi
 
-if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-  tmux a -t default || exec tmux new -s default && exit;
-fi
+#[[ $- != *i* ]] && return
+#[[ -z "$TMUX" ]] && exec "tmux"
+ZSH_TMUX_AUTOSTART=false
+[[ $TMUX == "" ]] && tmux new-session -A -s default
