@@ -85,10 +85,10 @@
 
 =Background    	black / bg_black
 =CPreproc 	dim gray
-=CPreprocKW 	bold gray dim
+=CPreprocKW 	bold white
 =CPreproc_cKW	bold cyan
-=CPreproc_sym	bold blue
-=CPreprocCComment	yellow
+=CPreproc_sym	cyan
+=CPreprocCComment	dim green
 =CPreprocUnknown	bold cyan / bg_blue
 =OpenMP			green
 =OpenMPkw		bold green
@@ -96,11 +96,11 @@
 =OpenMPcomment	yellow
 =OpenMPnonkw	red / bg_green
 =OpenMP_space	bold cyan
-=CComment	red dim
+=CComment	dim green
 =Special	cyan
 =Special2	green
 =GlueColor	dim gray
-=AssignColor	bold green
+=AssignColor    bold green
 =Numeric	bold blue
 =InvalidNumber	bold magenta / bg_red
 =NumericSuffix	bold blue
