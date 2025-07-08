@@ -84,8 +84,8 @@
 
 
 =Background    	black / bg_black
-=CPreproc 		gray
-=CPreprocKW 		bold gray
+=CPreproc 	dim gray
+=CPreprocKW 	bold gray dim
 =CPreproc_cKW	bold cyan
 =CPreproc_sym	bold blue
 =CPreprocCComment	yellow
@@ -96,22 +96,22 @@
 =OpenMPcomment	yellow
 =OpenMPnonkw	red / bg_green
 =OpenMP_space	bold cyan
-=CComment		red
-=Special		cyan
-=Special2		green
-=GlueColor		cyan
+=CComment	red dim
+=Special	cyan
+=Special2	green
+=GlueColor	dim gray
 =AssignColor	bold green
-=Numeric		bold blue
+=Numeric	bold blue
 =InvalidNumber	bold magenta / bg_red
-=NumericSuffix	magenta
-=String			bold green
-=StringContent	green
-=WString		bold blue
+=NumericSuffix	bold blue
+=String		bold cyan
+=StringContent	cyan
+=WString	bold cyan
 =WStringContent	cyan
-=Char			bold magenta
-=CharContent	magenta
-=WChar			bold blue
-=WCharContent	cyan
+=Char		bold cyan
+=CharContent	cyan
+=WChar		bold cyan
+=WCharContent	
 =AbruptStringTermination	bold green / bg_red
 =CKeyword		bold white
 =CType			bold white

@@ -38,9 +38,9 @@
 
  -nocurdir	Do not prompt with current directory
 
- -nobackups	If you don't want backup files to be created
+-nobackups	If you don't want backup files to be created
 
- -nodeadjoe	If you don't want DEADJOE files to be created
+-nodeadjoe	If you don't want DEADJOE files to be created
 
  -break_hardlinks
 		Delete file before writing, to break hard links
@@ -137,7 +137,7 @@
 
  -notagsmenu	Disable tags file search menu
 
- -icase         Search is case insensitive by default.
+-icase         Search is case insensitive by default.
 
  -wrap          Search wraps
 
@@ -149,7 +149,7 @@
 		position the cursor and left-click-drag will select blocks
 		For normal xterm cut and paste, hold the shift key down.
 
- -joexterm	If you are using XTerm version 212 or higher, and if it was
+-joexterm	If you are using XTerm version 212 or higher, and if it was
 		configured with --enable-paste64, set this flag: it allows
 		mouse cut & paste to work properly (text selected with the
 		mouse can be pasted into other application, and middle
