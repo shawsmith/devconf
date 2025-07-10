@@ -83,42 +83,42 @@
 
 
 
-=Background    	black / bg_black
-=CPreproc 		gray
-=CPreprocKW 		bold gray
-=CPreproc_cKW	bold cyan
-=CPreproc_sym	bold blue
-=CPreprocCComment	yellow
-=CPreprocUnknown	gray 
-=OpenMP			green
-=OpenMPkw		bold green
-=OpenMPkw2		bold green
-=OpenMPcomment	yellow
-=OpenMPnonkw	red / bg_green
-=OpenMP_space	bold cyan
-=CComment		gray
-=Special		cyan
+=Background    	fg_222 bg_000
+=CPreproc 	fg_333
+=CPreprocKW 	white bold
+=CPreproc_cKW	fg_445 dim
+=CPreproc_sym	fg_034 dim
+=CPreprocCComment fg_412 dim
+=CPreprocUnknown 	underline fg_500 bg_543		
+=OpenMP			underline fg_033
+=OpenMPkw		underline fg_253
+=OpenMPkw2		underline white
+=OpenMPcomment	underline fg_413
+=OpenMPnonkw	underline fg_500 bg_543
+=OpenMP_space	underline fg_132
+=CComment		fg_411
+=Special		fg_033
 =Special2		green
-=GlueColor		cyan
-=AssignColor	bold green
-=Numeric		bold blue
-=InvalidNumber	bold magenta / bg_red
-=NumericSuffix	magenta
-=String			bold green
-=StringContent	green
-=WString		bold blue
-=WStringContent	cyan
-=Char			bold magenta
-=CharContent	magenta
-=WChar			bold blue
-=WCharContent	cyan
-=AbruptStringTermination	bold green / bg_red
-=CKeyword		bold white
-=CType			bold white
-=STLkw			bold white
-=Identifier		white
-=Mystery		bold green / bg_red
-=TrailingSpace	black / black
+=GlueColor		fg_232
+=AssignColor	fg_251
+=Numeric	fg_315
+=InvalidNumber	fg_500 bg_542
+=NumericSuffix	fg_415
+=String		fg_024
+=StringContent	fg_035
+=WString	fg_021
+=WStringContent	fg_052
+=Char		fg_021
+=CharContent	fg_044
+=WChar		fg_331
+=WCharContent	fg_552
+=AbruptStringTermination	yellow bg_100	
+=CKeyword	bold white
+=CType		bold white
+=STLkw		fg_333
+=Identifier	white
+=Mystery	bg_000 fg_033
+=TrailingSpace	bg_002
 
 ########################
 # The rules begin here.
