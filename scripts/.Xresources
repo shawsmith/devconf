@@ -1,14 +1,16 @@
 XTerm*renderFont: true
-XTerm*faceName: SauceCodePro\ Nerd\ Font\ Mono
-XTerm*faceSize: 16
+!XTerm*faceName: IosevkaTerm\ Nerd\ Font\ Mono
+!XTerm*faceSize: 13
+XTerm*font: -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-15
 XTerm*Background: black
-XTerm*Foreground: gray
+XTerm*Foreground: white
+Xft.dpi: 90
 XTerm*allowBoldFonts: false
 XTerm.vt100.reverseVideo: false
 XTerm.vt100.bellIsUrgent: false
 
 XTerm.vt100.metaSendsEscape: true
-XTerm*geometry:	90x30
+XTerm*geometry:	115x60+390+65
 XTerm*dynamicColors: true
 XTerm*utf8:	2
 XTerm*eightBitInput:	true
