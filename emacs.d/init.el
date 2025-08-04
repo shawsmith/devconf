@@ -68,6 +68,16 @@
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
+(use-package doom-themes
+  :ensure t
+  :custom
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t)
+  :config
+  (load-theme 'doom-gruvbox t)
+  (doom-themes-visual-bell-config)
+  (doom-themes-org-config))
+
 (use-package restart-emacs
   :ensure t)
 
@@ -82,7 +92,7 @@
 (use-package hungry-delete
   :ensure t
   :bind (("C-c DEL" . hungry-delete-backward)
-	 ("C-c d" . hungry-delete-forward)))
+         ("C-c d" . hungry-delete-forward)))
 (global-hungry-delete-mode)
 
 (use-package drag-stuff
@@ -106,7 +116,7 @@
          :map ivy-switch-buffer-map
          ("C-k" . ivy-previous-line)
          ("C-l" . ivy-done)
-	 ("C-d" . ivy-switch-buffer-kill)
+	     ("C-d" . ivy-switch-buffer-kill)
          :map ivy-reverse-i-search-map
          ("C-k" . ivy-previous-line)
          ("C-d" . ivy-reverse-i-search-kill))
@@ -151,11 +161,6 @@
 (use-package exec-path-from-shell
   :ensure t
   :init (exec-path-from-shell-initialize))
-
-(use-package zenburn-theme
-  :ensure t
-  :init (load-theme 'zenburn t))
-
 (use-package treemacs
   :ensure t
   :defer t
@@ -270,7 +275,6 @@
   (setq lsp-keymap-prefix "C-c l")
   :hook ((c-mode . lsp)
          (c++-mode . lsp)
-         (java-mode . lsp)
          (rust-mode . lsp)
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
@@ -280,23 +284,3 @@
 
 (use-package lsp-ui
   :ensure t)
-
-(use-package lsp-java
-  :ensure t)
-(add-hook 'java-mode-hook #'lsp)
-
-(setq lsp-java-configuration-runtimes '[
-					                    (:name "JavaSE-21"
-						                       :path "/usr/local/jdk-21.0.2/"
-						                       :default t)])
-
-
-(require 'lsp-java-boot)
-(add-hook 'lsp-mode-hook 'lsp-lens-mode)
-(add-hook 'java-mode-hook 'lsp-java-boot-lens-mode)
-(add-hook 'before-save-hook 'lsp-format-buffer)
-(add-hook 'before-save-hook 'lsp-organize-imports)
-
-(use-package helm-lsp
-  :ensure t)
-(define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
