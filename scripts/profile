@@ -33,7 +33,7 @@ if [ -d /etc/profile.d ]; then
   unset i
 fi
 
-JAVA_HOME=/usr/local/jdk-21.0.2
+JAVA_HOME=/usr/lib/jvm/java-1.21.0-openjdk-amd64
 export JAVA_HOME
 
 M2_HOME=/usr/local/apache-maven-3.9.10
@@ -57,4 +57,4 @@ export PATH
 alias pbcopy='xclip -sel clip'
 alias emacs='emacs -nw'
 alias s='neofetch'
-
+alias gf='java -jar ~/Downloads/google-java-format-1.28.0-all-deps.jar'
