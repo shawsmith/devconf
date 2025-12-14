@@ -1,5 +1,5 @@
 {
-    "server":["hk39.kkp.wtf", "hk40.kkp.wtf"],
+    "server":["hk39.fualta.org", "hk40.fualta.org", "hk31.fualta.org"],
     "mode":"tcp_and_udp",
     "server_port":27094,
     "local_port":1081,
