@@ -34,9 +34,9 @@
 (add-hook 'write-file-functions 'delete-trailing-whitespace)
 
 ;;; Font configuration.
-(defvar efs/default-font-family "SauceCodePro Nerd Font Mono")
-(defvar efs/default-font-size 140)
-(defvar efs/default-variable-font-size 140)
+(defvar efs/default-font-family "IosevkaTerm Nerd Font Mono")
+(defvar efs/default-font-size 220)
+(defvar efs/default-variable-font-size 220)
 (set-face-attribute 'default nil
 		    :family efs/default-font-family
 		    :height efs/default-font-size
@@ -68,15 +68,10 @@
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
-(use-package doom-themes
+(use-package gruber-darker-theme
   :ensure t
-  :custom
-  (doom-themes-enable-bold t)
-  (doom-themes-enable-italic t)
   :config
-  (load-theme 'doom-gruvbox t)
-  (doom-themes-visual-bell-config)
-  (doom-themes-org-config))
+  (load-theme 'gruber-darker t))
 
 (use-package restart-emacs
   :ensure t)
