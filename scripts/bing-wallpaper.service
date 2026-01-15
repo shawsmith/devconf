@@ -7,7 +7,7 @@ Type=oneshot
 User=jarvis
 Environment="DISPLAY=:0"
 Environment="XAUTHORITY=/home/jarvis/.Xauthority"
-ExecStart=/usr/bin/python3 /home/jarvis/codebase/xfce-bing-wallpaper/bing-wallpaper.py
+ExecStart=/usr/bin/python3 /home/jarvis/codebase/devconf/scripts/bing-wallpaper.py
 
 [Install]
 WantedBy=default.target
