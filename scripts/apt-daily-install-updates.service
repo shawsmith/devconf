@@ -1,0 +1,11 @@
+[Unit]
+Description=APT Daily Install Updates Service
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/home/jarvis/codebase/devconf/scripts/download_and_install_updates.sh
+
+[Install]
+WantedBy=default.target

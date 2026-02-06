@@ -1,0 +1,10 @@
+[Unit]
+Description=APT Daily Install Updates Timer
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=6h
+Unit=apt-daily-install-updates.service
+
+[Install]
+WantedBy=timers.target
