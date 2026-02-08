@@ -33,10 +33,10 @@ if [ -d /etc/profile.d ]; then
   unset i
 fi
 
-JAVA_HOME=/usr/lib/jvm/java-1.21.0-openjdk-amd64
+JAVA_HOME=/usr/lib/jvm/java-1.25.0-openjdk-arm64
 export JAVA_HOME
 
-M2_HOME=/usr/local/apache-maven-3.9.10
+M2_HOME=/usr/local/apache-maven-3.9.12
 export M2_HOME
 
 RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup
@@ -56,5 +56,4 @@ export PATH
 
 alias pbcopy='xclip -sel clip'
 alias emacs='emacs -nw'
-alias s='neofetch'
-alias gf='java -jar ~/Downloads/google-java-format-1.28.0-all-deps.jar'
+alias s='fastfetch'
